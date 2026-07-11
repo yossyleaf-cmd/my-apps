@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>漢字よみクイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F3E9;
+    --paper-line:#DCD3BE;
+    --sumi:#2A2622;
+    --sumi-soft:#5C564C;
+    --hanko:#B5382E;
+    --hanko-deep:#8E2A22;
+    --ai:#2C4A6E;
+    --gold:#C79A3D;
+    --correct:#3D7A55;
+    --card:#FFFDF7;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    color:var(--sumi);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .stage{
+    width:100%;
+    max-width:480px;
+  }
+  .screen{ display:none; }
+  .screen.active{ display:block; animation:fadeUp .35s ease; }
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ---------- Header / brand ---------- */
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:22px;
+  }
+  .brand-mark{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:900;
+    font-size:15px;
+    color:var(--card);
+    background:var(--hanko);
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:3px;
+    letter-spacing:0;
+    box-shadow: 2px 2px 0 var(--hanko-deep);
+  }
+  .brand-text{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:700;
+    font-size:19px;
+    letter-spacing:.04em;
+  }
+  .brand-text small{
+    display:block;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:400;
+    font-size:11px;
+    color:var(--sumi-soft);
+    letter-spacing:.12em;
+    margin-top:1px;
+  }
+
+  /* ---------- Card ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    box-shadow: 4px 4px 0 rgba(42,38,34,.08);
+    padding:28px 24px;
+  }
+
+  /* ---------- Grade select ---------- */
+  .lead{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:700;
+    font-size:22px;
+    margin-bottom:6px;
+  }
+  .lead-sub{
+    font-size:13px;
+    color:var(--sumi-soft);
+    margin-bottom:22px;
+    line-height:1.7;
+  }
+  .grade-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:24px;
+  }
+  .grade-btn{
+    position:relative;
+    aspect-ratio:1;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+    font-family:'Zen Maru Gothic', sans-serif;
+  }
+  .grade-btn .num{
+    font-size:26px;
+    font-weight:900;
+    color:var(--sumi);
+  }
+  .grade-btn .lab{
+    font-size:10px;
+    color:var(--sumi-soft);
+    letter-spacing:.06em;
+  }
+  .grade-btn:hover{
+    transform:translate(-2px,-2px);
+    box-shadow:3px 3px 0 var(--hanko);
+    border-color:var(--hanko);
+    background:var(--card);
+  }
+  .grade-btn:hover .num{ color:var(--hanko); }
+
+  .field-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.1em;
+    color:var(--sumi-soft);
+    margin-bottom:8px;
+    display:block;
+  }
+  .toggle-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .toggle{
+    flex:1;
+    padding:11px 6px;
+    text-align:center;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+  }
+  .toggle.selected{
+    background:var(--ai);
+    border-color:var(--ai);
+    color:#fff;
+  }
+  .primary-btn{
+    width:100%;
+    padding:14px;
+    background:var(--hanko);
+    color:#fff;
+    border:none;
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.04em;
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--hanko-deep);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .primary-btn:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--hanko-deep); }
+  .primary-btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:12px;
+    color:var(--sumi-soft);
+    margin-bottom:10px;
+  }
+  .progress-track{
+    height:4px;
+    background:var(--paper-line);
+    margin-bottom:26px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--hanko);
+    width:30%;
+    transition:width .3s ease;
+  }
+  .kanji-frame{
+    width:148px;
+    height:148px;
+    margin:0 auto 22px;
+    border:1.5px solid var(--sumi);
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--card);
+  }
+  .kanji-frame::before,.kanji-frame::after{
+    content:'';
+    position:absolute;
+    background:var(--paper-line);
+  }
+  .kanji-frame::before{ left:50%; top:0; bottom:0; width:1px; }
+  .kanji-frame::after{ top:50%; left:0; right:0; height:1px; }
+  .kanji-char{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-size:88px;
+    font-weight:500;
+    color:var(--sumi);
+    position:relative;
+    z-index:1;
+  }
+  .kanji-type-tag{
+    display:block;
+    text-align:center;
+    font-size:11px;
+    letter-spacing:.15em;
+    color:var(--ai);
+    font-weight:700;
+    margin-bottom:26px;
+  }
+  .answer-input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-bottom:2px solid var(--sumi);
+    background:transparent;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:18px;
+    text-align:center;
+    margin-bottom:18px;
+    letter-spacing:.05em;
+  }
+  .answer-input:focus{ outline:none; border-color:var(--hanko); }
+  .choice-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .choice-btn{
+    padding:16px 8px;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    font-size:16px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    cursor:pointer;
+  }
+  .choice-btn:hover{ border-color:var(--ai); background:var(--card); }
+  .choice-btn.correct{ background:var(--correct); border-color:var(--correct); color:#fff; }
+  .choice-btn.wrong{ background:var(--hanko); border-color:var(--hanko); color:#fff; }
+  .feedback{
+    font-size:12px;
+    color:var(--sumi-soft);
+    text-align:center;
+    min-height:16px;
+    margin-bottom:10px;
+  }
+
+  /* ---------- Result screen ---------- */
+  .result-score{
+    text-align:center;
+    padding:14px 0 22px;
+  }
+  .result-score .big{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:900;
+    font-size:52px;
+    color:var(--hanko);
+    line-height:1;
+  }
+  .result-score .of{
+    font-size:14px;
+    color:var(--sumi-soft);
+    margin-top:6px;
+  }
+  .review-list{
+    list-style:none;
+    border-top:1px solid var(--paper-line);
+    margin-bottom:20px;
+  }
+  .review-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 4px;
+    border-bottom:1px solid var(--paper-line);
+    font-size:14px;
+  }
+  .review-item .rk{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-size:20px;
+    width:34px;
+  }
+  .review-item .ra{
+    color:var(--sumi-soft);
+    font-size:12px;
+  }
+  .review-item .rr{
+    color:var(--correct);
+    font-weight:700;
+  }
+  .btn-row{ display:flex; gap:10px; }
+  .btn-row .primary-btn{ flex:1; }
+  .ghost-btn{
+    flex:1;
+    padding:14px;
+    background:transparent;
+    border:1px solid var(--sumi);
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="brand">
+    <div class="brand-mark">読</div>
+    <div class="brand-text">かんじよみクイズ<small>KANJI READING DRILL</small></div>
+  </div>
+
+  <!-- SCREEN 1: 学年・モード選択 -->
+  <section id="screen-select" class="screen active">
+    <div class="card">
+      <div class="lead">学年をえらんでね</div>
+      <div class="lead-sub">1〜6年生の漢字から出題します。まず学年、つぎに出題方法をえらんでください。</div>
+
+      <span class="field-label">GRADE</span>
+      <div class="grade-grid">
+        <button class="grade-btn" data-grade="1"><span class="num">1</span><span class="lab">年生</span></button>
+        <button class="grade-btn" data-grade="2"><span class="num">2</span><span class="lab">年生</span></button>
+        <button class="grade-btn" data-grade="3"><span class="num">3</span><span class="lab">年生</span></button>
+        <button class="grade-btn" data-grade="4"><span class="num">4</span><span class="lab">年生</span></button>
+        <button class="grade-btn" data-grade="5"><span class="num">5</span><span class="lab">年生</span></button>
+        <button class="grade-btn" data-grade="6"><span class="num">6</span><span class="lab">年生</span></button>
+      </div>
+
+      <span class="field-label">MODE</span>
+      <div class="toggle-row">
+        <div class="toggle selected" data-mode="input">自由入力</div>
+        <div class="toggle" data-mode="choice">4択</div>
+      </div>
+
+      <button class="primary-btn" id="start-btn" disabled>クイズをはじめる</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: クイズ -->
+  <section id="screen-quiz" class="screen">
+    <div class="card">
+      <div class="quiz-top">
+        <span id="q-grade-label">3年生</span>
+        <span id="q-counter">3 / 10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:30%"></div></div>
+
+      <div class="kanji-frame"><span class="kanji-char" id="kanji-char">早</span></div>
+      <span class="kanji-type-tag" id="kanji-hint">よみがなを入力</span>
+
+      <div id="mode-input-area">
+        <input type="text" class="answer-input" id="answer-input" placeholder="ひらがなで こたえてね">
+      </div>
+      <div id="mode-choice-area" style="display:none;" class="choice-grid">
+        <button class="choice-btn">はやい</button>
+        <button class="choice-btn">おそい</button>
+        <button class="choice-btn">ちいさい</button>
+        <button class="choice-btn">おおきい</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <button class="primary-btn" id="next-btn">こたえる</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: 結果 -->
+  <section id="screen-result" class="screen">
+    <div class="card">
+      <div class="result-score">
+        <div class="big">8<span style="font-size:22px;color:var(--sumi-soft);">/10</span></div>
+        <div class="of">正解率 80% ・ 3年生 ・ 自由入力</div>
+      </div>
+
+      <span class="field-label">まちがえた問題</span>
+      <ul class="review-list">
+        <li class="review-item"><span class="rk">早</span><span class="ra">こたえ: そう</span><span class="rr">✕</span></li>
+        <li class="review-item"><span class="rk">村</span><span class="ra">こたえ: そん</span><span class="rr">✕</span></li>
+      </ul>
+
+      <div class="btn-row">
+        <button class="ghost-btn" id="retry-wrong-btn">まちがいだけ復習</button>
+        <button class="primary-btn" id="back-btn">学年選択へ</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // =========================================================
+  // 設定
+  // =========================================================
+  const BASE_URL = 'https://yossyleaf-cmd.github.io/kanji-quiz/';
+  const QUESTION_COUNT = 10; // 1回のクイズの出題数(プロトタイプ用の固定値)
+
+  // =========================================================
+  // 画面遷移
+  // =========================================================
+  const screens = {
+    select: document.getElementById('screen-select'),
+    quiz: document.getElementById('screen-quiz'),
+    result: document.getElementById('screen-result'),
+  };
+  function show(name){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  // =========================================================
+  // データ取得・キャッシュ
+  // =========================================================
+  const gradeCache = {}; // { 1: [questions...], 2: [...] , ... }
+
+  async function fetchGrade(n){
+    if (gradeCache[n]) return gradeCache[n];
+    try{
+      const res = await fetch(`${BASE_URL}grade${n}.json`);
+      if (!res.ok) throw new Error(`grade${n}.json not found (${res.status})`);
+      const json = await res.json();
+      gradeCache[n] = json.questions;
+      return json.questions;
+    }catch(err){
+      // まだ公開していない学年はスキップ(コンソールに警告だけ出す)
+      console.warn(`[kanji-quiz] grade${n} の読み込みをスキップしました:`, err.message);
+      gradeCache[n] = [];
+      return [];
+    }
+  }
+
+  // 選択学年 + それ以下の学年をまとめて取得(4択ダミー用プール)
+  async function fetchUpToGrade(grade){
+    const grades = [];
+    for (let g = 1; g <= grade; g++) grades.push(g);
+    const results = await Promise.all(grades.map(fetchGrade));
+    return results.flat();
+  }
+
+  // =========================================================
+  // グループ化(パターンB: 同じ漢字の音訓エントリを1問にまとめる)
+  // =========================================================
+  function groupByKanji(questions){
+    const map = new Map();
+    questions.forEach(q => {
+      if (!map.has(q.kanji)) map.set(q.kanji, { kanji: q.kanji, readings: [] });
+      map.get(q.kanji).readings.push({ reading: q.reading, type: q.type, alt: q.alt || [] });
+    });
+    return Array.from(map.values());
+  }
+
+  // 正解判定:音訓どちらか1つでも reading か alt に一致すればOK(方式①)
+  function isCorrect(userInput, group){
+    const normalized = (userInput || '').trim();
+    if (!normalized) return false;
+    return group.readings.some(r => r.reading === normalized || r.alt.includes(normalized));
+  }
+
+  // その漢字グループの「正解として表示していい読み」を1つ選ぶ(4択の正解ラベル用)
+  function pickDisplayReading(group){
+    const pick = group.readings[Math.floor(Math.random() * group.readings.length)];
+    return pick.reading;
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // 4択ダミー生成:選択中の学年以下のプールから、正解漢字以外の読みをランダムに3つ
+  function generateChoices(correctGroup, correctReading, poolGroups){
+    const others = poolGroups.filter(g => g.kanji !== correctGroup.kanji);
+    const candidateReadings = shuffle(others.map(g => pickDisplayReading(g)))
+      .filter((r, idx, self) => r !== correctReading && self.indexOf(r) === idx)
+      .slice(0, 3);
+    return shuffle([correctReading, ...candidateReadings]);
+  }
+
+  // =========================================================
+  // クイズの状態
+  // =========================================================
+  let state = {
+    grade: null,
+    mode: 'input', // 'input' | 'choice'
+    pool: [],        // 選択学年のグループ済みリスト(出題対象)
+    dummyPool: [],    // 選択学年以下のグループ済みリスト(4択ダミー用)
+    quizItems: [],    // 今回出題する分(シャッフル済み)
+    index: 0,
+    score: 0,
+    wrong: [],        // [{kanji, correctReading}]
+  };
+
+  // =========================================================
+  // 画面1: 学年・モード選択
+  // =========================================================
+  document.querySelectorAll('.grade-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.grade = Number(btn.dataset.grade);
+      document.querySelectorAll('.grade-btn').forEach(b=>{
+        b.style.borderColor = b===btn ? 'var(--hanko)' : 'var(--paper-line)';
+        b.style.boxShadow = b===btn ? '3px 3px 0 var(--hanko)' : 'none';
+      });
+      document.getElementById('start-btn').disabled = false;
+      document.getElementById('start-btn').textContent = 'クイズをはじめる';
+      document.getElementById('q-grade-label').textContent = state.grade + '年生';
+    });
+  });
+
+  document.querySelectorAll('.toggle').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      document.querySelectorAll('.toggle').forEach(x=>x.classList.remove('selected'));
+      t.classList.add('selected');
+      state.mode = t.dataset.mode;
+    });
+  });
+
+  document.getElementById('start-btn').addEventListener('click', async ()=>{
+    if (!state.grade) return;
+    const startBtn = document.getElementById('start-btn');
+    startBtn.disabled = true;
+    startBtn.textContent = '読み込み中…';
+
+    const [gradeQuestions, dummySourceQuestions] = await Promise.all([
+      fetchGrade(state.grade),
+      fetchUpToGrade(state.grade),
+    ]);
+
+    if (gradeQuestions.length === 0){
+      alert(`${state.grade}年生のデータ(grade${state.grade}.json)がまだ見つかりませんでした。GitHub上のファイルを確認してください。`);
+      startBtn.disabled = false;
+      startBtn.textContent = 'クイズをはじめる';
+      return;
+    }
+
+    state.pool = groupByKanji(gradeQuestions);
+    state.dummyPool = groupByKanji(dummySourceQuestions);
+    state.quizItems = shuffle(state.pool).slice(0, Math.min(QUESTION_COUNT, state.pool.length));
+    state.index = 0;
+    state.score = 0;
+    state.wrong = [];
+
+    startBtn.disabled = false;
+    startBtn.textContent = 'クイズをはじめる';
+
+    renderQuestion();
+    show('quiz');
+  });
+
+  // =========================================================
+  // 画面2: クイズ
+  // =========================================================
+  function currentGroup(){ return state.quizItems[state.index]; }
+
+  function renderQuestion(){
+    const group = currentGroup();
+    document.getElementById('kanji-char').textContent = group.kanji;
+    document.getElementById('q-counter').textContent = `${state.index + 1} / ${state.quizItems.length}`;
+    document.getElementById('progress-fill').style.width =
+      `${Math.round((state.index) / state.quizItems.length * 100)}%`;
+    document.getElementById('feedback').textContent = '';
+
+    const isChoice = state.mode === 'choice';
+    document.getElementById('mode-input-area').style.display = isChoice ? 'none' : 'block';
+    document.getElementById('mode-choice-area').style.display = isChoice ? 'grid' : 'none';
+    document.getElementById('kanji-hint').textContent = isChoice ? '正しいよみを選んでね' : 'よみがなを入力';
+
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.textContent = isChoice ? '次の問題へ' : 'こたえる';
+    nextBtn.disabled = isChoice; // 4択は選んだ時点で判定するので、最初は押せない状態
+
+    if (isChoice){
+      const correctReading = pickDisplayReading(group);
+      const choices = generateChoices(group, correctReading, state.dummyPool);
+      const choiceArea = document.getElementById('mode-choice-area');
+      choiceArea.innerHTML = '';
+      choices.forEach(reading => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = reading;
+        btn.addEventListener('click', () => handleChoiceAnswer(btn, reading, group));
+        choiceArea.appendChild(btn);
+      });
+    } else {
+      const input = document.getElementById('answer-input');
+      input.value = '';
+      input.disabled = false;
+      input.focus();
+    }
+  }
+
+  function handleChoiceAnswer(btn, reading, group){
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      b.disabled = true;
+      b.classList.remove('correct','wrong');
+    });
+    const correct = isCorrect(reading, group);
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    judge(correct, group);
+    document.getElementById('next-btn').disabled = false;
+  }
+
+  function handleInputAnswer(){
+    const input = document.getElementById('answer-input');
+    const group = currentGroup();
+    const correct = isCorrect(input.value, group);
+    input.disabled = true;
+    judge(correct, group);
+  }
+
+  function judge(correct, group){
+    const feedback = document.getElementById('feedback');
+    if (correct){
+      state.score++;
+      feedback.textContent = '○ せいかい!';
+      feedback.style.color = 'var(--correct)';
+    } else {
+      const shownReading = group.readings[0].reading;
+      state.wrong.push({ kanji: group.kanji, correctReading: shownReading });
+      feedback.textContent = `✕ こたえ:${shownReading}`;
+      feedback.style.color = 'var(--hanko)';
+    }
+  }
+
+  document.getElementById('next-btn').addEventListener('click', ()=>{
+    // 自由入力モードで、まだ判定していない(inputが有効=未回答)場合は先に判定する
+    const input = document.getElementById('answer-input');
+    if (state.mode === 'input' && !input.disabled){
+      handleInputAnswer();
+      document.getElementById('next-btn').textContent = '次の問題へ';
+      return;
+    }
+
+    state.index++;
+    if (state.index >= state.quizItems.length){
+      renderResult();
+      show('result');
+    } else {
+      renderQuestion();
+    }
+  });
+
+  // =========================================================
+  // 画面3: 結果
+  // =========================================================
+  function renderResult(){
+    const total = state.quizItems.length;
+    const score = state.score;
+    const rate = Math.round((score / total) * 100);
+
+    document.querySelector('.result-score .big').innerHTML =
+      `${score}<span style="font-size:22px;color:var(--sumi-soft);">/${total}</span>`;
+    document.querySelector('.result-score .of').textContent =
+      `正解率 ${rate}% ・ ${state.grade}年生 ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
+
+    const list = document.querySelector('.review-list');
+    list.innerHTML = '';
+    if (state.wrong.length === 0){
+      const li = document.createElement('li');
+      li.className = 'review-item';
+      li.innerHTML = `<span style="color:var(--sumi-soft);font-size:13px;">まちがいはありませんでした!</span>`;
+      list.appendChild(li);
+    } else {
+      state.wrong.forEach(w => {
+        const li = document.createElement('li');
+        li.className = 'review-item';
+        li.innerHTML = `<span class="rk">${w.kanji}</span><span class="ra">こたえ: ${w.correctReading}</span><span class="rr">✕</span>`;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('retry-wrong-btn').disabled = state.wrong.length === 0;
+    document.getElementById('retry-wrong-btn').style.opacity = state.wrong.length === 0 ? .4 : 1;
+  }
+
+  document.getElementById('back-btn').addEventListener('click', ()=> show('select'));
+
+  document.getElementById('retry-wrong-btn').addEventListener('click', ()=>{
+    if (state.wrong.length === 0) return;
+    // 間違えた漢字だけを再度グループから抽出して出題し直す
+    const wrongKanjiSet = new Set(state.wrong.map(w => w.kanji));
+    state.quizItems = shuffle(state.pool.filter(g => wrongKanjiSet.has(g.kanji)));
+    state.index = 0;
+    state.score = 0;
+    state.wrong = [];
+    renderQuestion();
+    show('quiz');
+  });
+</script>
+</body>
+</html>
