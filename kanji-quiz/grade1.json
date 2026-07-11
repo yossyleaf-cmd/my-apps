@@ -1,4 +1,4 @@
-"grade": 1,
+{"grade": 1,
 "label": "小学1年生",
 "questions": [
 { "kanji": "一", "reading": "いち", "type": "おんよみ", "alt": [] },
@@ -159,3 +159,4 @@
 { "kanji": "六", "reading": "ろく", "type": "おんよみ", "alt": [] },
 { "kanji": "六", "reading": "むっつ", "type": "くんよみ", "alt": ["む", "むい"] }
 ]
+}
