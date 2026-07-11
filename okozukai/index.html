@@ -1,1 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>おこづかい帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F2E8;
+    --paper-line:#DAD2BC;
+    --ink:#1E2A45;
+    --ink-soft:#5B6685;
+    --brass:#AD7A3B;
+    --brass-bg:#F1E3CC;
+    --silver:#7C8494;
+    --silver-bg:#E7E9ED;
+    --stamp:#B0342A;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    min-height:100dvh;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 38px,
+        var(--paper-line) 38px, var(--paper-line) 39px
+      ), var(--paper);
+    font-family:'Noto Sans JP',sans-serif;
+    color:var(--ink);
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+  }
+  .app{
+    max-width:900px;
+    margin:0 auto;
+    padding:22px 18px 40px;
+  }
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:20px;
+  }
+  header h1{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:.04em;
+    margin:0;
+  }
+  header span{
+    font-size:11px;
+    color:var(--ink-soft);
+    letter-spacing:.12em;
+  }
+
+  .board{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:640px){
+    .board{ grid-template-columns:1fr; }
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:12px;
+    padding:16px 16px 18px;
+    box-shadow:0 2px 0 var(--paper-line);
+  }
+
+  .name{
+    font-size:16px;
+    font-weight:700;
+    padding:4px 2px 10px;
+    border-bottom:1px dashed var(--paper-line);
+    margin-bottom:12px;
+    outline:none;
+  }
+  .name:focus{ color:var(--brass); }
+
+  /* ---- 合計 ---- */
+  .passbook-label{
+    font-size:10px;
+    color:var(--ink-soft);
+    letter-spacing:.14em;
+    margin-bottom:6px;
+  }
+  .total-row{
+    display:flex;
+    align-items:flex-end;
+    gap:5px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .digit-cell{
+    font-family:'Zilla Slab',serif;
+    font-weight:600;
+    font-size:32px;
+    line-height:1;
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    min-width:22px;
+    text-align:center;
+    padding:6px 2px 4px;
+    transition:transform .18s ease, background .18s ease;
+  }
+  .comma{
+    font-family:'Zilla Slab',serif;
+    font-size:26px;
+    align-self:flex-end;
+    color:var(--ink-soft);
+    padding-bottom:6px;
+    width:7px;
+    text-align:center;
+  }
+  .yen-suffix{
+    font-size:15px;
+    font-weight:700;
+    align-self:flex-end;
+    padding-bottom:9px;
+    margin-left:2px;
+    color:var(--ink-soft);
+  }
+  .total-row.bump .digit-cell{
+    transform:translateY(-3px);
+    background:#fff7e0;
+  }
+
+  /* ---- 硬貨の行 ---- */
+  .rows{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .row{
+    display:grid;
+    grid-template-columns:40px 1fr;
+    align-items:center;
+    column-gap:10px;
+    position:relative;
+  }
+  .coin{
+    width:40px;height:40px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size:12px;
+    border:2px solid currentColor;
+  }
+  .coin.d10{color:var(--brass); background:var(--brass-bg);}
+  .coin.d100{color:var(--silver); background:var(--silver-bg);}
+
+  .stepper{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:10px;
+  }
+  .stepper button{
+    height:56px;
+    border-radius:14px;
+    border:1.5px solid var(--ink);
+    background:var(--paper);
+    color:var(--ink);
+    font-size:28px;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;
+    width:100%;
+    transition:transform .08s ease, background .12s ease;
+  }
+  .stepper button:active{
+    transform:scale(.93);
+    background:var(--ink);
+    color:var(--paper);
+  }
+  .stepper .count{
+    min-width:34px;
+    text-align:center;
+    font-family:'Zilla Slab',serif;
+    font-size:19px;
+    color:var(--ink-soft);
+  }
+
+  .coin-fly{
+    position:absolute;
+    right:20px;
+    top:-4px;
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--brass);
+    pointer-events:none;
+    animation:fly .7s ease-out forwards;
+  }
+  @keyframes fly{
+    0%{opacity:1; transform:translateY(0) scale(1);}
+    100%{opacity:0; transform:translateY(-40px) scale(1.3);}
+  }
+
+  /* ---- リセット：はんこ風ボタン ---- */
+  .stamp-wrap{
+    display:flex;
+    justify-content:center;
+  }
+  .stamp{
+    width:78px;height:78px;
+    border-radius:50%;
+    border:3px double var(--stamp);
+    color:var(--stamp);
+    background:transparent;
+    font-family:'Noto Sans JP',sans-serif;
+    font-weight:900;
+    font-size:13px;
+    letter-spacing:.08em;
+    transform:rotate(-9deg);
+    display:flex;align-items:center;justify-content:center;
+    opacity:.85;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  .stamp:active{
+    transform:rotate(-9deg) scale(.9);
+    opacity:1;
+  }
+  .footnote{
+    text-align:center;
+    font-size:10px;
+    color:var(--ink-soft);
+    margin-top:16px;
+    letter-spacing:.08em;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>おこづかい帳</h1>
+    <span>POCKET&nbsp;MONEY</span>
+  </header>
+
+  <div class="board" id="board"></div>
+
+  <div class="footnote">名前をタップすると変更できます</div>
+
+</div>
+
+<script>
+const DENOMS = [
+  {value:10,  cls:'d10',  badge:'10'},
+  {value:100, cls:'d100', badge:'100'}
+];
+
+const PEOPLE = [
+  {id:'p1', name:'1人目'},
+  {id:'p2', name:'2人目'}
+];
+
+const state = {};
+PEOPLE.forEach(p=>{ state[p.id] = {10:0, 100:0}; });
+
+const board = document.getElementById('board');
+
+PEOPLE.forEach(p=>{
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="name" contenteditable="true" spellcheck="false">${p.name}</div>
+    <div class="passbook-label">ごうけい</div>
+    <div class="total-row" id="total-${p.id}"></div>
+    <div class="rows" id="rows-${p.id}"></div>
+    <div class="stamp-wrap">
+      <button class="stamp" data-reset="${p.id}">リセット</button>
+    </div>
+  `;
+  board.appendChild(card);
+
+  const rowsEl = card.querySelector(`#rows-${p.id}`);
+  DENOMS.forEach(d=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="coin ${d.cls}">${d.badge}</div>
+      <div class="stepper">
+        <button data-p="${p.id}" data-v="${d.value}" data-op="-1">−</button>
+        <div class="count" id="cnt-${p.id}-${d.value}">0</div>
+        <button data-p="${p.id}" data-v="${d.value}" data-op="1">＋</button>
+      </div>
+    `;
+    rowsEl.appendChild(row);
+  });
+
+  renderTotal(p.id);
+});
+
+function renderTotal(pid){
+  const s = state[pid];
+  const total = DENOMS.reduce((sum,d)=>sum + s[d.value]*d.value, 0);
+  const str = total.toLocaleString('ja-JP');
+  const totalEl = document.getElementById('total-'+pid);
+  totalEl.innerHTML = '';
+  for(const ch of str){
+    const c = document.createElement('div');
+    if(ch === ','){
+      c.className = 'comma';
+      c.textContent = ',';
+    } else {
+      c.className = 'digit-cell';
+      c.textContent = ch;
+    }
+    totalEl.appendChild(c);
+  }
+  const suf = document.createElement('div');
+  suf.className = 'yen-suffix';
+  suf.textContent = '円';
+  totalEl.appendChild(suf);
+
+  totalEl.classList.remove('bump');
+  void totalEl.offsetWidth;
+  totalEl.classList.add('bump');
+}
+
+function flyCoin(rowEl, plus){
+  const fly = document.createElement('div');
+  fly.className = 'coin-fly';
+  fly.textContent = plus ? '+' : '−';
+  rowEl.appendChild(fly);
+  setTimeout(()=>fly.remove(), 700);
+}
+
+board.addEventListener('click', (e)=>{
+  const resetBtn = e.target.closest('button[data-reset]');
+  if(resetBtn){
+    const pid = resetBtn.dataset.reset;
+    DENOMS.forEach(d=>{
+      state[pid][d.value] = 0;
+      document.getElementById(`cnt-${pid}-${d.value}`).textContent = 0;
+    });
+    renderTotal(pid);
+    return;
+  }
+
+  const btn = e.target.closest('button[data-v]');
+  if(!btn) return;
+  const pid = btn.dataset.p;
+  const value = Number(btn.dataset.v);
+  const op = Number(btn.dataset.op);
+  const next = state[pid][value] + op;
+  if(next < 0) return;
+  state[pid][value] = next;
+  document.getElementById(`cnt-${pid}-${value}`).textContent = next;
+  renderTotal(pid);
+  flyCoin(btn.closest('.row'), op > 0);
+});
+</script>
+</body>
+</html>
 
