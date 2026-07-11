@@ -256,7 +256,7 @@
 
   <div class="board" id="board"></div>
 
-  <div class="footnote">名前をタップすると変更できます</div>
+  <div class="footnote">名前をタップすると変更できます / 合計はリセットを押すまで保存されます</div>
 
 </div>
 
@@ -271,8 +271,34 @@ const PEOPLE = [
   {id:'p2', name:'2人目'}
 ];
 
+const STORAGE_KEY = 'okozukai-state-v1';
+
+let saved = null;
+try{
+  saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+}catch(e){ saved = null; }
+
+const names = {};
+PEOPLE.forEach(p=>{
+  names[p.id] = (saved && saved.names && saved.names[p.id]) ? saved.names[p.id] : p.name;
+});
+
 const state = {};
-PEOPLE.forEach(p=>{ state[p.id] = {10:0, 100:0}; });
+PEOPLE.forEach(p=>{
+  const savedCount = saved && saved.counts && saved.counts[p.id];
+  state[p.id] = {
+    10:  savedCount && Number.isFinite(savedCount[10])  ? savedCount[10]  : 0,
+    100: savedCount && Number.isFinite(savedCount[100]) ? savedCount[100] : 0
+  };
+});
+
+function saveState(){
+  const currentNames = {};
+  document.querySelectorAll('.name').forEach((el, idx)=>{
+    currentNames[PEOPLE[idx].id] = el.textContent.trim() || PEOPLE[idx].name;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({names: currentNames, counts: state}));
+}
 
 const board = document.getElementById('board');
 
@@ -280,7 +306,7 @@ PEOPLE.forEach(p=>{
   const card = document.createElement('div');
   card.className = 'card';
   card.innerHTML = `
-    <div class="name" contenteditable="true" spellcheck="false">${p.name}</div>
+    <div class="name" contenteditable="true" spellcheck="false">${names[p.id]}</div>
     <div class="passbook-label">ごうけい</div>
     <div class="total-row" id="total-${p.id}"></div>
     <div class="rows" id="rows-${p.id}"></div>
@@ -298,7 +324,7 @@ PEOPLE.forEach(p=>{
       <div class="coin ${d.cls}">${d.badge}</div>
       <div class="stepper">
         <button data-p="${p.id}" data-v="${d.value}" data-op="-1">−</button>
-        <div class="count" id="cnt-${p.id}-${d.value}">0</div>
+        <div class="count" id="cnt-${p.id}-${d.value}">${state[p.id][d.value]}</div>
         <button data-p="${p.id}" data-v="${d.value}" data-op="1">＋</button>
       </div>
     `;
@@ -352,6 +378,7 @@ board.addEventListener('click', (e)=>{
       document.getElementById(`cnt-${pid}-${d.value}`).textContent = 0;
     });
     renderTotal(pid);
+    saveState();
     return;
   }
 
@@ -366,8 +393,12 @@ board.addEventListener('click', (e)=>{
   document.getElementById(`cnt-${pid}-${value}`).textContent = next;
   renderTotal(pid);
   flyCoin(btn.closest('.row'), op > 0);
+  saveState();
+});
+
+board.addEventListener('input', (e)=>{
+  if(e.target.classList.contains('name')) saveState();
 });
 </script>
 </body>
 </html>
-
