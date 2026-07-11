@@ -445,25 +445,28 @@
 
   async function fetchGrade(n){
     if (gradeCache[n]) return gradeCache[n];
+    const url = `${BASE_URL}grade${n}.json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTPエラー ${res.status} : ${url}`);
+    let json;
     try{
-      const res = await fetch(`${BASE_URL}grade${n}.json`);
-      if (!res.ok) throw new Error(`grade${n}.json not found (${res.status})`);
-      const json = await res.json();
-      gradeCache[n] = json.questions;
-      return json.questions;
-    }catch(err){
-      // まだ公開していない学年はスキップ(コンソールに警告だけ出す)
-      console.warn(`[kanji-quiz] grade${n} の読み込みをスキップしました:`, err.message);
-      gradeCache[n] = [];
-      return [];
+      json = await res.json();
+    }catch(parseErr){
+      throw new Error(`JSONの形式が正しくありません(${url}): ${parseErr.message}`);
     }
+    gradeCache[n] = json.questions;
+    return json.questions;
   }
 
-  // 選択学年 + それ以下の学年をまとめて取得(4択ダミー用プール)
+  // 選択学年 + それ以下の学年をまとめて取得(4択ダミー用プール)。
+  // まだ存在しない学年ファイルはここでは無視してよいので、個別にtry/catchする。
   async function fetchUpToGrade(grade){
     const grades = [];
     for (let g = 1; g <= grade; g++) grades.push(g);
-    const results = await Promise.all(grades.map(fetchGrade));
+    const results = await Promise.all(grades.map(async g => {
+      try{ return await fetchGrade(g); }
+      catch(e){ console.warn(`grade${g}スキップ:`, e.message); return []; }
+    }));
     return results.flat();
   }
 
@@ -554,13 +557,19 @@
     startBtn.disabled = true;
     startBtn.textContent = '読み込み中…';
 
-    const [gradeQuestions, dummySourceQuestions] = await Promise.all([
-      fetchGrade(state.grade),
-      fetchUpToGrade(state.grade),
-    ]);
+    let gradeQuestions, dummySourceQuestions;
+    try{
+      gradeQuestions = await fetchGrade(state.grade);
+      dummySourceQuestions = await fetchUpToGrade(state.grade);
+    }catch(err){
+      alert(`データの読み込みに失敗しました。\n\n【エラー内容】\n${err.message}`);
+      startBtn.disabled = false;
+      startBtn.textContent = 'クイズをはじめる';
+      return;
+    }
 
-    if (gradeQuestions.length === 0){
-      alert(`${state.grade}年生のデータ(grade${state.grade}.json)がまだ見つかりませんでした。GitHub上のファイルを確認してください。`);
+    if (!gradeQuestions || gradeQuestions.length === 0){
+      alert(`${state.grade}年生のデータ(grade${state.grade}.json)が空、または見つかりませんでした。`);
       startBtn.disabled = false;
       startBtn.textContent = 'クイズをはじめる';
       return;
