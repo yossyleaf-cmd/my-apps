@@ -206,10 +206,14 @@
     width:30%;
     transition:width .3s ease;
   }
+  .kanji-stage{
+    position:relative;
+    width:148px;
+    margin:0 auto 22px;
+  }
   .kanji-frame{
     width:148px;
     height:148px;
-    margin:0 auto 22px;
     border:1.5px solid var(--sumi);
     position:relative;
     display:flex;
@@ -231,6 +235,34 @@
     color:var(--sumi);
     position:relative;
     z-index:1;
+  }
+  .judge-overlay{
+    position:absolute;
+    top:50%; left:50%;
+    width:210px; height:210px;
+    transform:translate(-50%,-50%) scale(0.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:900;
+    font-size:150px;
+    line-height:1;
+    opacity:0;
+    pointer-events:none;
+    z-index:5;
+    filter:drop-shadow(0 3px 0 rgba(0,0,0,.08));
+  }
+  .judge-overlay.correct{ color:var(--correct); }
+  .judge-overlay.wrong{ color:var(--hanko); }
+  .judge-overlay.show{
+    animation:judgePop .6s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes judgePop{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(0.3) rotate(-8deg); }
+    55%{ opacity:1; transform:translate(-50%,-50%) scale(1.15) rotate(3deg); }
+    75%{ transform:translate(-50%,-50%) scale(0.95) rotate(0deg); }
+    100%{ opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg); }
   }
   .kanji-type-tag{
     display:block;
@@ -378,7 +410,10 @@
       </div>
       <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:30%"></div></div>
 
-      <div class="kanji-frame"><span class="kanji-char" id="kanji-char">早</span></div>
+      <div class="kanji-stage">
+        <div class="kanji-frame"><span class="kanji-char" id="kanji-char">早</span></div>
+        <div class="judge-overlay" id="judge-overlay"></div>
+      </div>
       <span class="kanji-type-tag" id="kanji-hint">よみがなを入力</span>
 
       <div id="mode-input-area">
@@ -602,6 +637,10 @@
       `${Math.round((state.index) / state.quizItems.length * 100)}%`;
     document.getElementById('feedback').textContent = '';
 
+    const overlay = document.getElementById('judge-overlay');
+    overlay.classList.remove('show','correct','wrong');
+    overlay.textContent = '';
+
     const isChoice = state.mode === 'choice';
     document.getElementById('mode-input-area').style.display = isChoice ? 'none' : 'block';
     document.getElementById('mode-choice-area').style.display = isChoice ? 'grid' : 'none';
@@ -652,14 +691,24 @@
 
   function judge(correct, group){
     const feedback = document.getElementById('feedback');
+    const overlay = document.getElementById('judge-overlay');
+
+    overlay.classList.remove('show','correct','wrong');
+    // reflow を挟んでアニメーションを確実に再生させる
+    void overlay.offsetWidth;
+
     if (correct){
       state.score++;
-      feedback.textContent = '○ せいかい!';
+      overlay.textContent = '○';
+      overlay.classList.add('correct','show');
+      feedback.textContent = 'せいかい!';
       feedback.style.color = 'var(--correct)';
     } else {
       const shownReading = group.readings[0].reading;
       state.wrong.push({ kanji: group.kanji, correctReading: shownReading });
-      feedback.textContent = `✕ こたえ:${shownReading}`;
+      overlay.textContent = '✕';
+      overlay.classList.add('wrong','show');
+      feedback.textContent = `こたえ:${shownReading}`;
       feedback.style.color = 'var(--hanko)';
     }
   }
