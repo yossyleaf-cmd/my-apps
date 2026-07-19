@@ -1,1 +1,62 @@
+{
+  "grade": 1,
+  "title": "夏の課題 厳選単語50",
+  "words": [
+    { "id": "g1-001", "english": "Monday", "japanese": "月曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
+    { "id": "g1-002", "english": "Tuesday", "japanese": "火曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
+    { "id": "g1-003", "english": "Wednesday", "japanese": "水曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
+    { "id": "g1-004", "english": "Thursday", "japanese": "木曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
+    { "id": "g1-005", "english": "Friday", "japanese": "金曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
+    { "id": "g1-006", "english": "Saturday", "japanese": "土曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
+    { "id": "g1-007", "english": "Sunday", "japanese": "日曜日", "partOfSpeech": "noun", "subCategory": "weekday", "example": null, "audio": null },
 
+    { "id": "g1-008", "english": "father", "japanese": "お父さん", "partOfSpeech": "noun", "subCategory": "family", "example": null, "audio": null },
+    { "id": "g1-009", "english": "mother", "japanese": "お母さん", "partOfSpeech": "noun", "subCategory": "family", "example": null, "audio": null },
+    { "id": "g1-010", "english": "brother", "japanese": "兄、弟", "partOfSpeech": "noun", "subCategory": "family", "example": null, "audio": null },
+    { "id": "g1-011", "english": "sister", "japanese": "姉、妹", "partOfSpeech": "noun", "subCategory": "family", "example": null, "audio": null },
+    { "id": "g1-012", "english": "grandfather", "japanese": "おじいさん", "partOfSpeech": "noun", "subCategory": "family", "example": null, "audio": null },
+    { "id": "g1-013", "english": "grandmother", "japanese": "おばあさん", "partOfSpeech": "noun", "subCategory": "family", "example": null, "audio": null },
+
+    { "id": "g1-014", "english": "first", "japanese": "1番目の、最初の", "partOfSpeech": "adjective", "subCategory": "ordinal", "example": null, "audio": null },
+    { "id": "g1-015", "english": "second", "japanese": "2番目の", "partOfSpeech": "adjective", "subCategory": "ordinal", "example": null, "audio": null },
+    { "id": "g1-016", "english": "third", "japanese": "3番目の", "partOfSpeech": "adjective", "subCategory": "ordinal", "example": null, "audio": null },
+    { "id": "g1-017", "english": "fourth", "japanese": "4番目の", "partOfSpeech": "adjective", "subCategory": "ordinal", "example": null, "audio": null },
+    { "id": "g1-018", "english": "fifth", "japanese": "5番目の", "partOfSpeech": "adjective", "subCategory": "ordinal", "example": null, "audio": null },
+
+    { "id": "g1-019", "english": "school", "japanese": "学校", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-020", "english": "book", "japanese": "本", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-021", "english": "pen", "japanese": "ペン", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-022", "english": "dog", "japanese": "犬", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-023", "english": "cat", "japanese": "猫", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-024", "english": "house", "japanese": "家", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-025", "english": "tree", "japanese": "木", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-026", "english": "water", "japanese": "水", "partOfSpeech": "noun", "subCategory": null, "example": null, "audio": null },
+
+    { "id": "g1-027", "english": "run", "japanese": "走る", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-028", "english": "walk", "japanese": "歩く", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-029", "english": "eat", "japanese": "食べる", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-030", "english": "drink", "japanese": "飲む", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-031", "english": "play", "japanese": "(スポーツを)する、遊ぶ", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-032", "english": "study", "japanese": "勉強する", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-033", "english": "sleep", "japanese": "眠る", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-034", "english": "read", "japanese": "読む", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+
+    { "id": "g1-035", "english": "big", "japanese": "大きい", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-036", "english": "small", "japanese": "小さい", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-037", "english": "happy", "japanese": "幸せな", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-038", "english": "sad", "japanese": "悲しい", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-039", "english": "hot", "japanese": "暑い、熱い", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-040", "english": "cold", "japanese": "寒い、冷たい", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-041", "english": "new", "japanese": "新しい", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-042", "english": "old", "japanese": "古い、年をとった", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null },
+
+    { "id": "g1-043", "english": "always", "japanese": "いつも", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-044", "english": "often", "japanese": "よく、しばしば", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-045", "english": "sometimes", "japanese": "時々", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-046", "english": "never", "japanese": "決して〜ない", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-047", "english": "quickly", "japanese": "速く", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-048", "english": "slowly", "japanese": "ゆっくり", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-049", "english": "very", "japanese": "とても", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-050", "english": "today", "japanese": "今日", "partOfSpeech": "adverb", "subCategory": null, "example": null, "audio": null }
+  ]
+}
