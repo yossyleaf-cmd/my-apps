@@ -54,6 +54,7 @@
     { "id": "g1-045", "english": "use", "japanese": "使う", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
     { "id": "g1-046", "english": "make", "japanese": "作る", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
     { "id": "g1-047", "english": "thank", "japanese": "感謝する", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
-    { "id": "g1-048", "english": "know", "japanese": "知っている", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null }
+    { "id": "g1-048", "english": "know", "japanese": "知っている", "partOfSpeech": "verb", "subCategory": null, "example": null, "audio": null },
+    { "id": "g1-049", "english": "wonderful", "japanese": "すばらしい", "partOfSpeech": "adjective", "subCategory": null, "example": null, "audio": null }
   ]
 }
