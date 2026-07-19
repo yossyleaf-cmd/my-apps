@@ -181,10 +181,24 @@ body{
         <button class="grade-btn" data-grade="3" disabled><span class="num">3</span><span class="lab">準備中</span></button>
       </div>
 
+      <span class="field-label">DIRECTION</span>
+      <div class="toggle-row">
+        <div class="toggle selected" data-direction="en2ja">英 → 日</div>
+        <div class="toggle" data-direction="ja2en">日 → 英</div>
+      </div>
+
       <span class="field-label">MODE</span>
       <div class="toggle-row">
         <div class="toggle selected" data-mode="input">自由入力</div>
         <div class="toggle" data-mode="choice">4択</div>
+      </div>
+
+      <span class="field-label">COUNT</span>
+      <div class="toggle-row" id="count-row">
+        <div class="toggle selected" data-count="10">10問</div>
+        <div class="toggle" data-count="20">20問</div>
+        <div class="toggle" data-count="30">30問</div>
+        <div class="toggle" data-count="all">全問</div>
       </div>
 
       <button class="primary-btn" id="start-btn" disabled>クイズをはじめる</button>
@@ -240,7 +254,6 @@ body{
 // 設定
 // =========================================================
 const BASE_URL = 'https://yossyleaf-cmd.github.io/my-apps/english/';
-const QUESTION_COUNT = 10; // 1回のクイズの出題数(プロトタイプ用の固定値)
 
 // =========================================================
 // 画面遷移
@@ -289,9 +302,14 @@ function shuffle(arr){
 // 「兄、弟」のように複数語義が「、」区切りで入っている場合、
 // いずれか一致すれば正解とする
 // =========================================================
-function isCorrect(userInput, word){
+function isCorrect(userInput, word, direction){
   const normalized = (userInput || '').trim();
   if (!normalized) return false;
+
+  if (direction === 'ja2en'){
+    return normalized.toLowerCase() === word.english.trim().toLowerCase();
+  }
+  // en2ja: 「兄、弟」のように複数語義が「、」区切りの場合、いずれか一致すれば正解
   const variants = word.japanese.split('、').map(v => v.trim());
   return variants.includes(normalized);
 }
@@ -300,9 +318,9 @@ function isCorrect(userInput, word){
 // 4択生成:subCategory → partOfSpeech → 全体プール の優先順位
 // (検証時の修正を反映:partOfSpeech段階ではsubCategoryを持つ単語は除外)
 // =========================================================
-function generateChoices(correctWord, pool){
+function generateChoices(correctWord, pool, labelField){
   const others = pool.filter(w => w.id !== correctWord.id);
-  const notDuplicateMeaning = (w) => w.japanese !== correctWord.japanese;
+  const notDuplicateMeaning = (w) => w[labelField] !== correctWord[labelField];
 
   const sameSubCategory = others.filter(w =>
     w.subCategory && w.subCategory === correctWord.subCategory && notDuplicateMeaning(w)
@@ -336,7 +354,9 @@ function generateChoices(correctWord, pool){
 // =========================================================
 let state = {
   grade: null,
-  mode: 'input', // 'input' | 'choice'
+  mode: 'input',        // 'input' | 'choice'
+  direction: 'en2ja',   // 'en2ja'(英→日) | 'ja2en'(日→英)
+  questionCount: '10',  // '10' | '20' | '30' | 'all'
   pool: [],       // 出題対象の単語リスト
   quizItems: [],  // 今回出題する分(シャッフル済み)
   index: 0,
@@ -360,11 +380,27 @@ document.querySelectorAll('.grade-btn').forEach(btn=>{
   });
 });
 
-document.querySelectorAll('.toggle').forEach(t=>{
+document.querySelectorAll('[data-mode]').forEach(t=>{
   t.addEventListener('click', ()=>{
-    document.querySelectorAll('.toggle').forEach(x=>x.classList.remove('selected'));
+    document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('selected'));
     t.classList.add('selected');
     state.mode = t.dataset.mode;
+  });
+});
+
+document.querySelectorAll('[data-direction]').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-direction]').forEach(x=>x.classList.remove('selected'));
+    t.classList.add('selected');
+    state.direction = t.dataset.direction;
+  });
+});
+
+document.querySelectorAll('[data-count]').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-count]').forEach(x=>x.classList.remove('selected'));
+    t.classList.add('selected');
+    state.questionCount = t.dataset.count; // '10' | '20' | '30' | 'all'
   });
 });
 
@@ -391,7 +427,10 @@ document.getElementById('start-btn').addEventListener('click', async ()=>{
   }
 
   state.pool = words;
-  state.quizItems = shuffle(state.pool).slice(0, Math.min(QUESTION_COUNT, state.pool.length));
+  const requestedCount = state.questionCount === 'all'
+    ? state.pool.length
+    : Number(state.questionCount);
+  state.quizItems = shuffle(state.pool).slice(0, Math.min(requestedCount, state.pool.length));
   state.index = 0;
   state.score = 0;
   state.wrong = [];
@@ -409,7 +448,13 @@ function currentWord(){ return state.quizItems[state.index]; }
 
 function renderQuestion(){
   const word = currentWord();
-  document.getElementById('word-text').textContent = word.english;
+  const direction = state.direction;
+  // en2ja: 英語を見て日本語で答える → 出題は english、答え(選択肢表示)は japanese
+  // ja2en: 日本語を見て英語で答える → 出題は japanese、答え(選択肢表示)は english
+  const questionField = direction === 'en2ja' ? 'english' : 'japanese';
+  const labelField = direction === 'en2ja' ? 'japanese' : 'english';
+
+  document.getElementById('word-text').textContent = word[questionField];
   document.getElementById('q-counter').textContent = `${state.index + 1} / ${state.quizItems.length}`;
   document.getElementById('progress-fill').style.width =
     `${Math.round((state.index) / state.quizItems.length * 100)}%`;
@@ -422,25 +467,31 @@ function renderQuestion(){
   const isChoice = state.mode === 'choice';
   document.getElementById('mode-input-area').style.display = isChoice ? 'none' : 'block';
   document.getElementById('mode-choice-area').style.display = isChoice ? 'grid' : 'none';
-  document.getElementById('word-hint').textContent = isChoice ? '正しい意味を選んでね' : '日本語の意味を入力';
+
+  const hintText = direction === 'en2ja'
+    ? (isChoice ? '正しい意味を選んでね' : '日本語の意味を入力')
+    : (isChoice ? '正しい単語を選んでね' : '英語のスペルを入力');
+  document.getElementById('word-hint').textContent = hintText;
+
+  const input = document.getElementById('answer-input');
+  input.placeholder = direction === 'en2ja' ? '日本語で こたえてね' : '英語で こたえてね(半角)';
 
   const nextBtn = document.getElementById('next-btn');
   nextBtn.textContent = isChoice ? '次の問題へ' : 'こたえる';
   nextBtn.disabled = isChoice; // 4択は選んだ時点で判定するので、最初は押せない状態
 
   if (isChoice){
-    const choices = generateChoices(word, state.pool);
+    const choices = generateChoices(word, state.pool, labelField);
     const choiceArea = document.getElementById('mode-choice-area');
     choiceArea.innerHTML = '';
     choices.forEach(choiceWord => {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
-      btn.textContent = choiceWord.japanese;
+      btn.textContent = choiceWord[labelField];
       btn.addEventListener('click', () => handleChoiceAnswer(btn, choiceWord, word));
       choiceArea.appendChild(btn);
     });
   } else {
-    const input = document.getElementById('answer-input');
     input.value = '';
     input.disabled = false;
     input.focus();
@@ -461,7 +512,7 @@ function handleChoiceAnswer(btn, choiceWord, word){
 function handleInputAnswer(){
   const input = document.getElementById('answer-input');
   const word = currentWord();
-  const correct = isCorrect(input.value, word);
+  const correct = isCorrect(input.value, word, state.direction);
   input.disabled = true;
   judge(correct, word);
 }
@@ -471,6 +522,9 @@ function judge(correct, word){
   const overlay = document.getElementById('judge-overlay');
   overlay.classList.remove('show','correct','wrong');
   void overlay.offsetWidth; // reflowを挟んでアニメーションを確実に再生させる
+
+  // 出題方向に応じて「こたえ」として表示するフィールドを切り替える
+  const answerField = state.direction === 'en2ja' ? 'japanese' : 'english';
 
   if (correct){
     state.score++;
@@ -482,7 +536,7 @@ function judge(correct, word){
     state.wrong.push({ english: word.english, japanese: word.japanese });
     overlay.textContent = '✕';
     overlay.classList.add('wrong','show');
-    feedback.textContent = `こたえ:${word.japanese}`;
+    feedback.textContent = `こたえ:${word[answerField]}`;
     feedback.style.color = 'var(--hanko)';
   }
 }
@@ -513,8 +567,9 @@ function renderResult(){
 
   document.getElementById('score-big').innerHTML =
     `${score}<span style="font-size:22px;color:var(--sumi-soft);">/${total}</span>`;
+  const directionLabel = state.direction === 'en2ja' ? '英→日' : '日→英';
   document.getElementById('score-of').textContent =
-    `正解率 ${rate}% ・ ${state.grade}年生 ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
+    `正解率 ${rate}% ・ ${state.grade}年生 ・ ${directionLabel} ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
 
   const list = document.getElementById('review-list');
   list.innerHTML = '';
