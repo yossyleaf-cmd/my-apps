@@ -206,8 +206,8 @@ body{
 
       <span class="field-label">MODE</span>
       <div class="toggle-row">
-        <div class="toggle selected" data-mode="input">自由入力</div>
-        <div class="toggle" data-mode="choice">4択</div>
+        <div class="toggle" data-mode="input">自由入力</div>
+        <div class="toggle selected" data-mode="choice">4択</div>
       </div>
 
       <span class="field-label">COUNT</span>
@@ -327,8 +327,8 @@ function isCorrect(userInput, word, direction){
   if (direction === 'ja2en'){
     return normalized.toLowerCase() === word.english.trim().toLowerCase();
   }
-  // en2ja: 「兄、弟」のように複数語義が「、」区切りの場合、いずれか一致すれば正解
-  const variants = word.japanese.split('、').map(v => v.trim());
+  // en2ja: 「姉・妹」「兄・弟」のように「、」または「・」区切りで複数語義が入っている場合、いずれか一致すれば正解
+  const variants = word.japanese.split(/[、・]/).map(v => v.trim());
   return variants.includes(normalized);
 }
 
@@ -373,7 +373,7 @@ function generateChoices(correctWord, pool, labelField){
 let state = {
   grade: null,
   name: 'ゆうき',        // なまえ選択(現状は固定1名、後で選択肢を追加予定)
-  mode: 'input',        // 'input' | 'choice'
+  mode: 'choice',        // 'input' | 'choice'
   direction: 'en2ja',   // 'en2ja'(英→日) | 'ja2en'(日→英)
   questionCount: '10',  // '10' | '20' | '30' | 'all'
   pool: [],       // 出題対象の単語リスト
