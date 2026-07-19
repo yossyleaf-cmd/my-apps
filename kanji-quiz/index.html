@@ -109,6 +109,11 @@ body{
 .kanji-frame::before{ left:50%; top:0; bottom:0; width:1px; }
 .kanji-frame::after{ top:50%; left:0; right:0; height:1px; }
 .kanji-char{ font-family:'Zen Maru Gothic', sans-serif; font-size:88px; font-weight:500; color:var(--sumi); position:relative; z-index:1; }
+.kanji-frame.wide{ width:auto; min-width:148px; height:auto; padding:22px 20px; }
+.kanji-frame.wide::before,.kanji-frame.wide::after{ display:none; }
+.kanji-frame.wide .kanji-char{ font-size:clamp(28px, 8vw, 56px); }
+
+.toggle.disabled{ opacity:.35; cursor:not-allowed; pointer-events:none; }
 
 .judge-overlay{
   position:absolute; top:50%; left:50%; width:210px; height:210px;
@@ -188,10 +193,24 @@ body{
         <button class="grade-btn" data-grade="6"><span class="num">6</span><span class="lab">年生</span></button>
       </div>
 
+      <span class="field-label">DIRECTION</span>
+      <div class="toggle-row">
+        <div class="toggle selected" data-direction="kanji2yomi">漢字 → よみ</div>
+        <div class="toggle" data-direction="yomi2kanji">よみ → 漢字</div>
+      </div>
+
       <span class="field-label">MODE</span>
       <div class="toggle-row">
         <div class="toggle selected" data-mode="input">自由入力</div>
         <div class="toggle" data-mode="choice">4択</div>
+      </div>
+
+      <span class="field-label">COUNT</span>
+      <div class="toggle-row">
+        <div class="toggle selected" data-count="10">10問</div>
+        <div class="toggle" data-count="20">20問</div>
+        <div class="toggle" data-count="30">30問</div>
+        <div class="toggle" data-count="all">全問</div>
       </div>
 
       <button class="primary-btn" id="start-btn" disabled>クイズをはじめる</button>
@@ -247,7 +266,6 @@ body{
 // 設定
 // =========================================================
 const BASE_URL = 'https://yossyleaf-cmd.github.io/my-apps/kanji-quiz/';
-const QUESTION_COUNT = 10; // 1回のクイズの出題数(プロトタイプ用の固定値)
 const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxC7KcDilmmICkvjCO_Lxl1Jt1SdGNervFPLvgoDdLZ12tKRncwkccgO34wj4O4cj2whw/exec';
 
 // =========================================================
@@ -338,6 +356,15 @@ function generateChoices(correctGroup, correctReading, poolGroups){
   return shuffle([correctReading, ...candidateReadings]);
 }
 
+// 4択ダミー生成(逆方向:よみ→漢字):正解漢字以外の漢字をランダムに3つ
+function generateChoicesReverse(correctGroup, poolGroups){
+  const others = poolGroups.filter(g => g.kanji !== correctGroup.kanji);
+  const candidateKanji = shuffle(others.map(g => g.kanji))
+    .filter((k, idx, self) => self.indexOf(k) === idx)
+    .slice(0, 3);
+  return shuffle([correctGroup.kanji, ...candidateKanji]);
+}
+
 // =========================================================
 // ログ送信(Google Apps Script経由でquiz-logsスプレッドシートへ)
 // 送信に失敗してもクイズ自体は問題なく続けられるよう、エラーは握りつぶして console にのみ残す
@@ -362,7 +389,9 @@ async function sendLog(payload){
 let state = {
   grade: null,
   name: 'はると', // なまえ選択(デフォルト:はると)
+  direction: 'kanji2yomi', // 'kanji2yomi'(漢字→よみ) | 'yomi2kanji'(よみ→漢字)
   mode: 'input', // 'input' | 'choice'
+  questionCount: '10', // '10' | '20' | '30' | 'all'
   pool: [],       // 選択学年のグループ済みリスト(出題対象)
   dummyPool: [],  // 選択学年以下のグループ済みリスト(4択ダミー用)
   quizItems: [],  // 今回出題する分(シャッフル済み)
@@ -391,11 +420,39 @@ document.querySelectorAll('.grade-btn').forEach(btn=>{
   });
 });
 
-document.querySelectorAll('.toggle').forEach(t=>{
+document.querySelectorAll('[data-direction]').forEach(t=>{
   t.addEventListener('click', ()=>{
-    document.querySelectorAll('.toggle').forEach(x=>x.classList.remove('selected'));
+    document.querySelectorAll('[data-direction]').forEach(x=>x.classList.remove('selected'));
+    t.classList.add('selected');
+    state.direction = t.dataset.direction;
+
+    const inputToggle = document.querySelector('[data-mode="input"]');
+    const choiceToggle = document.querySelector('[data-mode="choice"]');
+    if (state.direction === 'yomi2kanji'){
+      // よみ→漢字はIMEの変換候補で答えが見えてしまうため、自由入力を無効化して4択に固定する
+      inputToggle.classList.add('disabled');
+      document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('selected'));
+      choiceToggle.classList.add('selected');
+      state.mode = 'choice';
+    } else {
+      inputToggle.classList.remove('disabled');
+    }
+  });
+});
+
+document.querySelectorAll('[data-mode]').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('selected'));
     t.classList.add('selected');
     state.mode = t.dataset.mode;
+  });
+});
+
+document.querySelectorAll('[data-count]').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-count]').forEach(x=>x.classList.remove('selected'));
+    t.classList.add('selected');
+    state.questionCount = t.dataset.count; // '10' | '20' | '30' | 'all'
   });
 });
 
@@ -424,7 +481,11 @@ document.getElementById('start-btn').addEventListener('click', async ()=>{
 
   state.pool = groupByKanji(gradeQuestions);
   state.dummyPool = groupByKanji(dummySourceQuestions);
-  state.quizItems = shuffle(state.pool).slice(0, Math.min(QUESTION_COUNT, state.pool.length));
+  if (state.direction === 'yomi2kanji') state.mode = 'choice'; // 念のための安全策
+  const requestedCount = state.questionCount === 'all'
+    ? state.pool.length
+    : Number(state.questionCount);
+  state.quizItems = shuffle(state.pool).slice(0, Math.min(requestedCount, state.pool.length));
   state.index = 0;
   state.score = 0;
   state.wrong = [];
@@ -442,7 +503,10 @@ function currentGroup(){ return state.quizItems[state.index]; }
 
 function renderQuestion(){
   const group = currentGroup();
-  document.getElementById('kanji-char').textContent = group.kanji;
+  const direction = state.direction;
+  const frame = document.querySelector('.kanji-frame');
+  const charEl = document.getElementById('kanji-char');
+
   document.getElementById('q-counter').textContent = `${state.index + 1} / ${state.quizItems.length}`;
   document.getElementById('progress-fill').style.width =
     `${Math.round((state.index) / state.quizItems.length * 100)}%`;
@@ -452,14 +516,39 @@ function renderQuestion(){
   overlay.classList.remove('show','correct','wrong');
   overlay.textContent = '';
 
+  // よみ→漢字はIMEでの答え漏れを避けるため常に4択(renderQuestion呼び出し前にstate.modeは'choice'に強制済み)
   const isChoice = state.mode === 'choice';
   document.getElementById('mode-input-area').style.display = isChoice ? 'none' : 'block';
   document.getElementById('mode-choice-area').style.display = isChoice ? 'grid' : 'none';
-  document.getElementById('kanji-hint').textContent = isChoice ? '正しいよみを選んでね' : 'よみがなを入力';
 
   const nextBtn = document.getElementById('next-btn');
   nextBtn.textContent = isChoice ? '次の問題へ' : 'こたえる';
   nextBtn.disabled = isChoice; // 4択は選んだ時点で判定するので、最初は押せない状態
+
+  if (direction === 'yomi2kanji'){
+    // 出題:よみ(ひらがな) → 選択肢:漢字
+    const questionReading = pickDisplayReading(group);
+    charEl.textContent = questionReading;
+    frame.classList.add('wide');
+    document.getElementById('kanji-hint').textContent = '正しい漢字を選んでね';
+
+    const choices = generateChoicesReverse(group, state.dummyPool);
+    const choiceArea = document.getElementById('mode-choice-area');
+    choiceArea.innerHTML = '';
+    choices.forEach(kanjiChar => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = kanjiChar;
+      btn.addEventListener('click', () => handleChoiceAnswerReverse(btn, kanjiChar, group));
+      choiceArea.appendChild(btn);
+    });
+    return;
+  }
+
+  // 通常方向:漢字 → よみ
+  charEl.textContent = group.kanji;
+  frame.classList.remove('wide');
+  document.getElementById('kanji-hint').textContent = isChoice ? '正しいよみを選んでね' : 'よみがなを入力';
 
   if (isChoice){
     const correctReading = pickDisplayReading(group);
@@ -492,6 +581,17 @@ function handleChoiceAnswer(btn, reading, group){
   document.getElementById('next-btn').disabled = false;
 }
 
+function handleChoiceAnswerReverse(btn, kanjiChar, group){
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    b.classList.remove('correct','wrong');
+  });
+  const correct = kanjiChar === group.kanji;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  judge(correct, group, group.kanji); // 不正解時の「こたえ」表示は漢字そのものにする
+  document.getElementById('next-btn').disabled = false;
+}
+
 function handleInputAnswer(){
   const input = document.getElementById('answer-input');
   const group = currentGroup();
@@ -500,7 +600,7 @@ function handleInputAnswer(){
   judge(correct, group);
 }
 
-function judge(correct, group){
+function judge(correct, group, answerLabelOverride){
   const feedback = document.getElementById('feedback');
   const overlay = document.getElementById('judge-overlay');
   overlay.classList.remove('show','correct','wrong');
@@ -513,11 +613,11 @@ function judge(correct, group){
     feedback.textContent = 'せいかい!';
     feedback.style.color = 'var(--correct)';
   } else {
-    const shownReading = group.readings[0].reading;
-    state.wrong.push({ kanji: group.kanji, correctReading: shownReading });
+    const shownAnswer = answerLabelOverride !== undefined ? answerLabelOverride : group.readings[0].reading;
+    state.wrong.push({ kanji: group.kanji, correctReading: shownAnswer });
     overlay.textContent = '✕';
     overlay.classList.add('wrong','show');
-    feedback.textContent = `こたえ:${shownReading}`;
+    feedback.textContent = `こたえ:${shownAnswer}`;
     feedback.style.color = 'var(--hanko)';
   }
 }
@@ -548,8 +648,9 @@ function renderResult(){
 
   document.querySelector('.result-score .big').innerHTML =
     `${score}<span style="font-size:22px;color:var(--sumi-soft);">/${total}</span>`;
+  const directionLabel = state.direction === 'yomi2kanji' ? 'よみ→漢字' : '漢字→よみ';
   document.querySelector('.result-score .of').textContent =
-    `正解率 ${rate}% ・ ${state.grade}年生 ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
+    `正解率 ${rate}% ・ ${state.grade}年生 ・ ${directionLabel} ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
 
   const list = document.querySelector('.review-list');
   list.innerHTML = '';
@@ -574,6 +675,7 @@ function renderResult(){
     app: 'kanji',
     name: state.name,
     grade: state.grade,
+    direction: directionLabel,
     mode: state.mode === 'input' ? '自由入力' : '4択',
     score: score,
     total: total,
