@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英単語れんしゅう</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F3E9;
+  --paper-line:#DCD3BE;
+  --sumi:#2A2622;
+  --sumi-soft:#5C564C;
+  --ai:#2C4A6E;
+  --ai-deep:#20374F;
+  --hanko:#B5382E;
+  --gold:#C79A3D;
+  --correct:#3D7A55;
+  --card:#FFFDF7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--paper);
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  font-family:'Zen Kaku Gothic New', sans-serif;
+  color:var(--sumi);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.stage{ width:100%; max-width:480px; }
+.screen{ display:none; }
+.screen.active{ display:block; animation:fadeUp .35s ease; }
+@keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+.brand{ display:flex; align-items:baseline; gap:10px; margin-bottom:22px; }
+.brand-mark{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-weight:900; font-size:15px;
+  color:var(--card); background:var(--ai);
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:3px;
+  box-shadow: 2px 2px 0 var(--ai-deep);
+}
+.brand-text{ font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:19px; letter-spacing:.04em; }
+.brand-text small{ display:block; font-family:'Zen Kaku Gothic New', sans-serif; font-weight:400; font-size:11px; color:var(--sumi-soft); letter-spacing:.12em; margin-top:1px; }
+
+.card{ background:var(--card); border:1px solid var(--paper-line); box-shadow: 4px 4px 0 rgba(42,38,34,.08); padding:28px 24px; }
+
+.lead{ font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:22px; margin-bottom:6px; }
+.lead-sub{ font-size:13px; color:var(--sumi-soft); margin-bottom:22px; line-height:1.7; }
+
+.field-label{ font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--sumi-soft); margin-bottom:8px; display:block; }
+
+.grade-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+.grade-btn{
+  position:relative; aspect-ratio:1;
+  border:1px solid var(--paper-line); background:var(--paper);
+  cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+.grade-btn .num{ font-size:26px; font-weight:900; color:var(--sumi); }
+.grade-btn .lab{ font-size:10px; color:var(--sumi-soft); letter-spacing:.06em; }
+.grade-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--ai); border-color:var(--ai); background:var(--card); }
+.grade-btn:hover .num{ color:var(--ai); }
+.grade-btn:disabled{ opacity:.35; cursor:not-allowed; }
+.grade-btn:disabled:hover{ transform:none; box-shadow:none; border-color:var(--paper-line); background:var(--paper); }
+
+.toggle-row{ display:flex; gap:8px; margin-bottom:20px; }
+.toggle{ flex:1; padding:11px 6px; text-align:center; border:1px solid var(--paper-line); background:var(--paper); font-size:13px; font-weight:500; cursor:pointer; }
+.toggle.selected{ background:var(--ai); border-color:var(--ai); color:#fff; }
+
+.primary-btn{
+  width:100%; padding:14px; background:var(--ai); color:#fff; border:none;
+  font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:15px; letter-spacing:.04em;
+  cursor:pointer; box-shadow:3px 3px 0 var(--ai-deep);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.primary-btn:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ai-deep); }
+.primary-btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
+
+.quiz-top{ display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--sumi-soft); margin-bottom:10px; }
+.progress-track{ height:4px; background:var(--paper-line); margin-bottom:26px; }
+.progress-fill{ height:100%; background:var(--ai); width:0%; transition:width .3s ease; }
+
+.word-stage{ position:relative; margin:0 auto 20px; display:flex; justify-content:center; }
+.word-frame{
+  min-width:180px; max-width:100%;
+  padding:22px 20px;
+  border:1.5px solid var(--sumi);
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card);
+}
+.word-text{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:clamp(24px, 7vw, 34px);
+  font-weight:700;
+  color:var(--sumi);
+  letter-spacing:.02em;
+  text-align:center;
+}
+.judge-overlay{
+  position:absolute; top:50%; left:50%;
+  width:150px; height:150px;
+  transform:translate(-50%,-50%) scale(0.4);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Zen Maru Gothic', sans-serif; font-weight:900; font-size:110px; line-height:1;
+  opacity:0; pointer-events:none; z-index:5;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.08));
+}
+.judge-overlay.correct{ color:var(--correct); }
+.judge-overlay.wrong{ color:var(--hanko); }
+.judge-overlay.show{ animation:judgePop .6s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes judgePop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(0.3) rotate(-8deg); }
+  55%{ opacity:1; transform:translate(-50%,-50%) scale(1.15) rotate(3deg); }
+  75%{ transform:translate(-50%,-50%) scale(0.95) rotate(0deg); }
+  100%{ opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg); }
+}
+
+.word-hint{ display:block; text-align:center; font-size:11px; letter-spacing:.15em; color:var(--ai); font-weight:700; margin-bottom:22px; }
+
+.answer-input{
+  width:100%; padding:14px; border:none; border-bottom:2px solid var(--sumi); background:transparent;
+  font-family:'Zen Kaku Gothic New', sans-serif; font-size:18px; text-align:center; margin-bottom:18px; letter-spacing:.05em;
+}
+.answer-input:focus{ outline:none; border-color:var(--ai); }
+
+.choice-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+.choice-btn{ padding:16px 8px; border:1px solid var(--paper-line); background:var(--paper); font-size:15px; font-family:'Zen Kaku Gothic New', sans-serif; cursor:pointer; }
+.choice-btn:hover{ border-color:var(--ai); background:var(--card); }
+.choice-btn.correct{ background:var(--correct); border-color:var(--correct); color:#fff; }
+.choice-btn.wrong{ background:var(--hanko); border-color:var(--hanko); color:#fff; }
+.choice-btn:disabled{ cursor:not-allowed; }
+
+.feedback{ font-size:12px; color:var(--sumi-soft); text-align:center; min-height:16px; margin-bottom:10px; }
+
+.result-score{ text-align:center; padding:14px 0 22px; }
+.result-score .big{ font-family:'Zen Maru Gothic', sans-serif; font-weight:900; font-size:52px; color:var(--ai); line-height:1; }
+.result-score .of{ font-size:14px; color:var(--sumi-soft); margin-top:6px; }
+
+.review-list{ list-style:none; border-top:1px solid var(--paper-line); margin-bottom:20px; max-height:260px; overflow-y:auto; }
+.review-item{ display:flex; align-items:center; justify-content:space-between; padding:12px 4px; border-bottom:1px solid var(--paper-line); font-size:14px; gap:8px; }
+.review-item .rw{ font-family:'Zen Maru Gothic', sans-serif; font-size:15px; font-weight:700; flex-shrink:0; }
+.review-item .ra{ color:var(--sumi-soft); font-size:12px; flex:1; text-align:right; }
+.review-item .rr{ color:var(--hanko); font-weight:700; flex-shrink:0; }
+
+.btn-row{ display:flex; gap:10px; }
+.btn-row .primary-btn{ flex:1; }
+.ghost-btn{ flex:1; padding:14px; background:transparent; border:1px solid var(--sumi); font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:14px; cursor:pointer; }
+.ghost-btn:disabled{ opacity:.4; cursor:not-allowed; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="brand">
+    <div class="brand-mark">英</div>
+    <div class="brand-text">英単語れんしゅう<small>ENGLISH WORD DRILL</small></div>
+  </div>
+
+  <!-- SCREEN 1: 学年・モード選択 -->
+  <section id="screen-select" class="screen active">
+    <div class="card">
+      <div class="lead">学年をえらんでね</div>
+      <div class="lead-sub">中学1〜3年生の単語から出題します。まず学年、つぎに出題方法をえらんでください。</div>
+
+      <span class="field-label">GRADE</span>
+      <div class="grade-grid">
+        <button class="grade-btn" data-grade="1"><span class="num">1</span><span class="lab">年生</span></button>
+        <button class="grade-btn" data-grade="2" disabled><span class="num">2</span><span class="lab">準備中</span></button>
+        <button class="grade-btn" data-grade="3" disabled><span class="num">3</span><span class="lab">準備中</span></button>
+      </div>
+
+      <span class="field-label">MODE</span>
+      <div class="toggle-row">
+        <div class="toggle selected" data-mode="input">自由入力</div>
+        <div class="toggle" data-mode="choice">4択</div>
+      </div>
+
+      <button class="primary-btn" id="start-btn" disabled>クイズをはじめる</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: クイズ -->
+  <section id="screen-quiz" class="screen">
+    <div class="card">
+      <div class="quiz-top">
+        <span id="q-grade-label">1年生</span>
+        <span id="q-counter">1 / 10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+      <div class="word-stage">
+        <div class="word-frame"><span class="word-text" id="word-text">day</span></div>
+        <div class="judge-overlay" id="judge-overlay"></div>
+      </div>
+      <span class="word-hint" id="word-hint">日本語の意味を入力</span>
+
+      <div id="mode-input-area">
+        <input type="text" class="answer-input" id="answer-input" placeholder="日本語で こたえてね">
+      </div>
+      <div id="mode-choice-area" style="display:none;" class="choice-grid"></div>
+
+      <div class="feedback" id="feedback"></div>
+      <button class="primary-btn" id="next-btn">こたえる</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: 結果 -->
+  <section id="screen-result" class="screen">
+    <div class="card">
+      <div class="result-score">
+        <div class="big" id="score-big">0<span style="font-size:22px;color:var(--sumi-soft);">/10</span></div>
+        <div class="of" id="score-of">正解率 0% ・ 1年生 ・ 自由入力</div>
+      </div>
+
+      <span class="field-label">まちがえた単語</span>
+      <ul class="review-list" id="review-list"></ul>
+
+      <div class="btn-row">
+        <button class="ghost-btn" id="retry-wrong-btn">まちがいだけ復習</button>
+        <button class="primary-btn" id="back-btn">学年選択へ</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// =========================================================
+// 設定
+// =========================================================
+const BASE_URL = 'https://yossyleaf-cmd.github.io/my-apps/english/';
+const QUESTION_COUNT = 10; // 1回のクイズの出題数(プロトタイプ用の固定値)
+
+// =========================================================
+// 画面遷移
+// =========================================================
+const screens = {
+  select: document.getElementById('screen-select'),
+  quiz: document.getElementById('screen-quiz'),
+  result: document.getElementById('screen-result'),
+};
+function show(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+// =========================================================
+// データ取得・キャッシュ
+// =========================================================
+const gradeCache = {}; // { 1: [words...], 2: [...] , ... }
+
+async function fetchGrade(n){
+  if (gradeCache[n]) return gradeCache[n];
+  const url = `${BASE_URL}grade${n}.json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTPエラー ${res.status} : ${url}`);
+  let json;
+  try{
+    json = await res.json();
+  }catch(parseErr){
+    throw new Error(`JSONの形式が正しくありません(${url}): ${parseErr.message}`);
+  }
+  gradeCache[n] = json.words;
+  return json.words;
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// =========================================================
+// 正誤判定(自由入力モード)
+// 「兄、弟」のように複数語義が「、」区切りで入っている場合、
+// いずれか一致すれば正解とする
+// =========================================================
+function isCorrect(userInput, word){
+  const normalized = (userInput || '').trim();
+  if (!normalized) return false;
+  const variants = word.japanese.split('、').map(v => v.trim());
+  return variants.includes(normalized);
+}
+
+// =========================================================
+// 4択生成:subCategory → partOfSpeech → 全体プール の優先順位
+// (検証時の修正を反映:partOfSpeech段階ではsubCategoryを持つ単語は除外)
+// =========================================================
+function generateChoices(correctWord, pool){
+  const others = pool.filter(w => w.id !== correctWord.id);
+  const notDuplicateMeaning = (w) => w.japanese !== correctWord.japanese;
+
+  const sameSubCategory = others.filter(w =>
+    w.subCategory && w.subCategory === correctWord.subCategory && notDuplicateMeaning(w)
+  );
+  const samePartOfSpeech = others.filter(w =>
+    w.partOfSpeech === correctWord.partOfSpeech && !w.subCategory && notDuplicateMeaning(w)
+  );
+  const fullPool = others.filter(notDuplicateMeaning);
+
+  const dummies = [];
+  const usedIds = new Set();
+
+  function pickFrom(source, count){
+    const shuffled = shuffle(source).filter(w => !usedIds.has(w.id));
+    for (const w of shuffled){
+      if (dummies.length >= count) break;
+      dummies.push(w);
+      usedIds.add(w.id);
+    }
+  }
+
+  pickFrom(sameSubCategory, 3);
+  if (dummies.length < 3) pickFrom(samePartOfSpeech, 3);
+  if (dummies.length < 3) pickFrom(fullPool, 3);
+
+  return shuffle([correctWord, ...dummies]);
+}
+
+// =========================================================
+// クイズの状態
+// =========================================================
+let state = {
+  grade: null,
+  mode: 'input', // 'input' | 'choice'
+  pool: [],       // 出題対象の単語リスト
+  quizItems: [],  // 今回出題する分(シャッフル済み)
+  index: 0,
+  score: 0,
+  wrong: [],      // [{english, japanese}]
+};
+
+// =========================================================
+// 画面1: 学年・モード選択
+// =========================================================
+document.querySelectorAll('.grade-btn').forEach(btn=>{
+  if (btn.disabled) return;
+  btn.addEventListener('click', ()=>{
+    state.grade = Number(btn.dataset.grade);
+    document.querySelectorAll('.grade-btn').forEach(b=>{
+      b.style.borderColor = b===btn ? 'var(--ai)' : 'var(--paper-line)';
+      b.style.boxShadow = b===btn ? '3px 3px 0 var(--ai)' : 'none';
+    });
+    document.getElementById('start-btn').disabled = false;
+    document.getElementById('q-grade-label').textContent = state.grade + '年生';
+  });
+});
+
+document.querySelectorAll('.toggle').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.toggle').forEach(x=>x.classList.remove('selected'));
+    t.classList.add('selected');
+    state.mode = t.dataset.mode;
+  });
+});
+
+document.getElementById('start-btn').addEventListener('click', async ()=>{
+  if (!state.grade) return;
+  const startBtn = document.getElementById('start-btn');
+  startBtn.disabled = true;
+  startBtn.textContent = '読み込み中…';
+
+  let words;
+  try{
+    words = await fetchGrade(state.grade);
+  }catch(err){
+    alert(`データの読み込みに失敗しました。\n\n【エラー内容】\n${err.message}`);
+    startBtn.disabled = false;
+    startBtn.textContent = 'クイズをはじめる';
+    return;
+  }
+  if (!words || words.length === 0){
+    alert(`${state.grade}年生のデータ(grade${state.grade}.json)が空、または見つかりませんでした。`);
+    startBtn.disabled = false;
+    startBtn.textContent = 'クイズをはじめる';
+    return;
+  }
+
+  state.pool = words;
+  state.quizItems = shuffle(state.pool).slice(0, Math.min(QUESTION_COUNT, state.pool.length));
+  state.index = 0;
+  state.score = 0;
+  state.wrong = [];
+
+  startBtn.disabled = false;
+  startBtn.textContent = 'クイズをはじめる';
+  renderQuestion();
+  show('quiz');
+});
+
+// =========================================================
+// 画面2: クイズ
+// =========================================================
+function currentWord(){ return state.quizItems[state.index]; }
+
+function renderQuestion(){
+  const word = currentWord();
+  document.getElementById('word-text').textContent = word.english;
+  document.getElementById('q-counter').textContent = `${state.index + 1} / ${state.quizItems.length}`;
+  document.getElementById('progress-fill').style.width =
+    `${Math.round((state.index) / state.quizItems.length * 100)}%`;
+  document.getElementById('feedback').textContent = '';
+
+  const overlay = document.getElementById('judge-overlay');
+  overlay.classList.remove('show','correct','wrong');
+  overlay.textContent = '';
+
+  const isChoice = state.mode === 'choice';
+  document.getElementById('mode-input-area').style.display = isChoice ? 'none' : 'block';
+  document.getElementById('mode-choice-area').style.display = isChoice ? 'grid' : 'none';
+  document.getElementById('word-hint').textContent = isChoice ? '正しい意味を選んでね' : '日本語の意味を入力';
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.textContent = isChoice ? '次の問題へ' : 'こたえる';
+  nextBtn.disabled = isChoice; // 4択は選んだ時点で判定するので、最初は押せない状態
+
+  if (isChoice){
+    const choices = generateChoices(word, state.pool);
+    const choiceArea = document.getElementById('mode-choice-area');
+    choiceArea.innerHTML = '';
+    choices.forEach(choiceWord => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choiceWord.japanese;
+      btn.addEventListener('click', () => handleChoiceAnswer(btn, choiceWord, word));
+      choiceArea.appendChild(btn);
+    });
+  } else {
+    const input = document.getElementById('answer-input');
+    input.value = '';
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+function handleChoiceAnswer(btn, choiceWord, word){
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    b.classList.remove('correct','wrong');
+  });
+  const correct = choiceWord.id === word.id;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  judge(correct, word);
+  document.getElementById('next-btn').disabled = false;
+}
+
+function handleInputAnswer(){
+  const input = document.getElementById('answer-input');
+  const word = currentWord();
+  const correct = isCorrect(input.value, word);
+  input.disabled = true;
+  judge(correct, word);
+}
+
+function judge(correct, word){
+  const feedback = document.getElementById('feedback');
+  const overlay = document.getElementById('judge-overlay');
+  overlay.classList.remove('show','correct','wrong');
+  void overlay.offsetWidth; // reflowを挟んでアニメーションを確実に再生させる
+
+  if (correct){
+    state.score++;
+    overlay.textContent = '○';
+    overlay.classList.add('correct','show');
+    feedback.textContent = 'せいかい!';
+    feedback.style.color = 'var(--correct)';
+  } else {
+    state.wrong.push({ english: word.english, japanese: word.japanese });
+    overlay.textContent = '✕';
+    overlay.classList.add('wrong','show');
+    feedback.textContent = `こたえ:${word.japanese}`;
+    feedback.style.color = 'var(--hanko)';
+  }
+}
+
+document.getElementById('next-btn').addEventListener('click', ()=>{
+  const input = document.getElementById('answer-input');
+  if (state.mode === 'input' && !input.disabled){
+    handleInputAnswer();
+    document.getElementById('next-btn').textContent = '次の問題へ';
+    return;
+  }
+  state.index++;
+  if (state.index >= state.quizItems.length){
+    renderResult();
+    show('result');
+  } else {
+    renderQuestion();
+  }
+});
+
+// =========================================================
+// 画面3: 結果
+// =========================================================
+function renderResult(){
+  const total = state.quizItems.length;
+  const score = state.score;
+  const rate = Math.round((score / total) * 100);
+
+  document.getElementById('score-big').innerHTML =
+    `${score}<span style="font-size:22px;color:var(--sumi-soft);">/${total}</span>`;
+  document.getElementById('score-of').textContent =
+    `正解率 ${rate}% ・ ${state.grade}年生 ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
+
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  if (state.wrong.length === 0){
+    const li = document.createElement('li');
+    li.className = 'review-item';
+    li.innerHTML = `<span style="color:var(--sumi-soft);font-size:13px;">まちがいはありませんでした!</span>`;
+    list.appendChild(li);
+  } else {
+    state.wrong.forEach(w => {
+      const li = document.createElement('li');
+      li.className = 'review-item';
+      li.innerHTML = `<span class="rw">${w.english}</span><span class="ra">${w.japanese}</span><span class="rr">✕</span>`;
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('retry-wrong-btn').disabled = state.wrong.length === 0;
+}
+
+document.getElementById('back-btn').addEventListener('click', ()=> show('select'));
+
+document.getElementById('retry-wrong-btn').addEventListener('click', ()=>{
+  if (state.wrong.length === 0) return;
+  const wrongEnglishSet = new Set(state.wrong.map(w => w.english));
+  state.quizItems = shuffle(state.pool.filter(w => wrongEnglishSet.has(w.english)));
+  state.index = 0;
+  state.score = 0;
+  state.wrong = [];
+  renderQuestion();
+  show('quiz');
+});
+</script>
+</body>
+</html>
