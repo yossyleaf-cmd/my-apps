@@ -458,6 +458,7 @@ let state = {
   index: 0,
   score: 0,
   wrong: [],      // [{kanji, correctReading}]
+  currentAnswerLabel: null, // 今の問題で「正解」として実際に表示した読み(4択時の判定・表示の一貫性を保つため)
 };
 
 // =========================================================
@@ -614,6 +615,7 @@ function renderQuestion(){
 
   if (isChoice){
     const correctReading = pickDisplayReading(group);
+    state.currentAnswerLabel = correctReading; // このユニット選択肢内で実際に「正解」とした読み
     const choices = generateChoices(group, correctReading, state.dummyPool);
     const choiceArea = document.getElementById('mode-choice-area');
     choiceArea.innerHTML = '';
@@ -637,9 +639,12 @@ function handleChoiceAnswer(btn, reading, group){
     b.disabled = true;
     b.classList.remove('correct','wrong');
   });
-  const correct = isCorrect(reading, group);
+  // 選択肢に実際に表示した正解(state.currentAnswerLabel)と完全一致するかで判定する。
+  // isCorrect()(readings全体からのゆるい一致)を使うと、選択肢に出ていない読みでも
+  // 正解扱いになってしまうことがあるため使わない。
+  const correct = reading === state.currentAnswerLabel;
   btn.classList.add(correct ? 'correct' : 'wrong');
-  judge(correct, group);
+  judge(correct, group, state.currentAnswerLabel);
   document.getElementById('next-btn').disabled = false;
 }
 
@@ -659,7 +664,9 @@ function handleInputAnswer(){
   const group = currentGroup();
   const correct = isCorrect(input.value, group);
   input.disabled = true;
-  judge(correct, group);
+  // 自由入力はどの読みで答えても正解になるため、不正解時は「持っている読み全部」を見せる
+  const allReadings = group.readings.map(r => r.reading).join('・');
+  judge(correct, group, allReadings);
 }
 
 function judge(correct, group, answerLabelOverride){
