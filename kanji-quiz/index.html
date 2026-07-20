@@ -82,6 +82,37 @@ body{
 .grade-btn .lab{ font-size:10px; color:var(--sumi-soft); letter-spacing:.06em; }
 .grade-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--hanko); border-color:var(--hanko); background:var(--card); }
 .grade-btn:hover .num{ color:var(--hanko); }
+.grade-btn.selected{ border-color:var(--hanko); box-shadow:3px 3px 0 var(--hanko); background:var(--card); }
+.grade-btn.selected .num{ color:var(--hanko); }
+
+/* 上段:学期選択(大きめ) */
+.term-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+.term-btn{
+  position:relative; aspect-ratio:1;
+  border:1px solid var(--paper-line); background:var(--paper);
+  cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+.term-btn .term-num{ font-size:30px; font-weight:900; color:var(--sumi); }
+.term-btn .term-lab{ font-size:11px; color:var(--sumi-soft); letter-spacing:.06em; }
+.term-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--hanko); border-color:var(--hanko); background:var(--card); }
+.term-btn:hover .term-num{ color:var(--hanko); }
+.term-btn.selected{ border-color:var(--hanko); box-shadow:3px 3px 0 var(--hanko); background:var(--card); }
+.term-btn.selected .term-num{ color:var(--hanko); }
+.term-btn:disabled{ opacity:.3; cursor:not-allowed; }
+.term-btn:disabled:hover{ transform:none; box-shadow:none; border-color:var(--paper-line); background:var(--paper); }
+.term-btn:disabled .term-num{ color:var(--sumi); }
+
+/* 下段:学年選択(小さめ、常時表示) */
+.grade-grid-small{ display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-bottom:24px; }
+.grade-btn-sm{
+  aspect-ratio:1; border:1px solid var(--paper-line); background:var(--paper);
+  font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:14px; color:var(--sumi);
+  cursor:pointer; transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.grade-btn-sm:hover{ border-color:var(--hanko); }
+.grade-btn-sm.selected{ background:var(--hanko); border-color:var(--hanko); color:#fff; }
 
 .toggle-row{ display:flex; gap:8px; margin-bottom:20px; }
 .toggle{ flex:1; padding:11px 6px; text-align:center; border:1px solid var(--paper-line); background:var(--paper); font-size:13px; font-weight:500; cursor:pointer; }
@@ -183,14 +214,21 @@ body{
         <option value="ゆうき">ゆうき</option>
       </select>
 
+      <span class="field-label">4年生の学期(くわしく選ぶ)</span>
+      <div class="term-grid">
+        <button class="term-btn" data-unit="4-1"><span class="term-num">1</span><span class="term-lab">学期</span></button>
+        <button class="term-btn" data-unit="4-2"><span class="term-num">2</span><span class="term-lab">学期</span></button>
+        <button class="term-btn" data-unit="4-3" disabled><span class="term-num">3</span><span class="term-lab">準備中</span></button>
+      </div>
+
       <span class="field-label">GRADE</span>
-      <div class="grade-grid">
-        <button class="grade-btn" data-grade="1"><span class="num">1</span><span class="lab">年生</span></button>
-        <button class="grade-btn" data-grade="2"><span class="num">2</span><span class="lab">年生</span></button>
-        <button class="grade-btn" data-grade="3"><span class="num">3</span><span class="lab">年生</span></button>
-        <button class="grade-btn" data-grade="4"><span class="num">4</span><span class="lab">年生</span></button>
-        <button class="grade-btn" data-grade="5"><span class="num">5</span><span class="lab">年生</span></button>
-        <button class="grade-btn" data-grade="6"><span class="num">6</span><span class="lab">年生</span></button>
+      <div class="grade-grid-small">
+        <button class="grade-btn-sm" data-unit="1">1</button>
+        <button class="grade-btn-sm" data-unit="2">2</button>
+        <button class="grade-btn-sm" data-unit="3">3</button>
+        <button class="grade-btn-sm" data-unit="4">4</button>
+        <button class="grade-btn-sm" data-unit="5">5</button>
+        <button class="grade-btn-sm" data-unit="6">6</button>
       </div>
 
       <span class="field-label">DIRECTION</span>
@@ -282,13 +320,31 @@ function show(name){
 }
 
 // =========================================================
+// 出題ユニット設定(学期分割に対応)
+// FILE_ORDER: 実際に存在するJSONファイルを教育順に並べたもの。
+//   4年生は1学期・2学期でファイルが分かれている(「4年全部」用のファイルは作らず、実行時に合体する)
+// UNITS: 画面に出す選択肢。files に指定したファイルを合体して出題プールにする。
+// =========================================================
+const FILE_ORDER = ['grade1', 'grade2', 'grade3', 'grade4-1', 'grade4-2', 'grade5', 'grade6'];
+const UNITS = {
+  '1':   { label: '1年生',       files: ['grade1'] },
+  '2':   { label: '2年生',       files: ['grade2'] },
+  '3':   { label: '3年生',       files: ['grade3'] },
+  '4':   { label: '4年生(全部)', files: ['grade4-1', 'grade4-2'] },
+  '5':   { label: '5年生',       files: ['grade5'] },
+  '6':   { label: '6年生',       files: ['grade6'] },
+  '4-1': { label: '4年 1学期',   files: ['grade4-1'] },
+  '4-2': { label: '4年 2学期',   files: ['grade4-2'] },
+};
+
+// =========================================================
 // データ取得・キャッシュ
 // =========================================================
-const gradeCache = {}; // { 1: [questions...], 2: [...] , ... }
+const fileCache = {}; // { 'grade1': [questions...], 'grade4-1': [...] , ... }
 
-async function fetchGrade(n){
-  if (gradeCache[n]) return gradeCache[n];
-  const url = `${BASE_URL}grade${n}.json`;
+async function fetchFile(name){
+  if (fileCache[name]) return fileCache[name];
+  const url = `${BASE_URL}${name}.json`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTPエラー ${res.status} : ${url}`);
   let json;
@@ -297,20 +353,24 @@ async function fetchGrade(n){
   }catch(parseErr){
     throw new Error(`JSONの形式が正しくありません(${url}): ${parseErr.message}`);
   }
-  gradeCache[n] = json.questions;
+  fileCache[name] = json.questions;
   return json.questions;
 }
 
-// 選択学年 + それ以下の学年をまとめて取得(4択ダミー用プール)。
-// まだ存在しない学年ファイルはここでは無視してよいので、個別にtry/catchする。
-async function fetchUpToGrade(grade){
-  const grades = [];
-  for (let g = 1; g <= grade; g++) grades.push(g);
-  const results = await Promise.all(grades.map(async g => {
-    try{ return await fetchGrade(g); }
-    catch(e){ console.warn(`grade${g}スキップ:`, e.message); return []; }
+// 複数ファイルをまとめて取得して結合する(存在しない/失敗したファイルはスキップして続行)
+async function fetchFiles(names){
+  const results = await Promise.all(names.map(async name => {
+    try{ return await fetchFile(name); }
+    catch(e){ console.warn(`${name}スキップ:`, e.message); return []; }
   }));
   return results.flat();
+}
+
+// 指定ファイル群のうち、FILE_ORDER上で一番後ろにあるものの位置までを累積したファイル名リストを返す
+// (4択ダミー用プール。まだ習っていない範囲の漢字が紛れ込まないようにするため)
+function getCumulativeFiles(unitFiles){
+  const maxIdx = Math.max(...unitFiles.map(f => FILE_ORDER.indexOf(f)));
+  return FILE_ORDER.slice(0, maxIdx + 1);
 }
 
 // =========================================================
@@ -387,13 +447,13 @@ async function sendLog(payload){
 // クイズの状態
 // =========================================================
 let state = {
-  grade: null,
+  unitId: null, // '1'〜'6' または '4-1'/'4-2'(UNITSのキー)
   name: 'はると', // なまえ選択(デフォルト:はると)
   direction: 'kanji2yomi', // 'kanji2yomi'(漢字→よみ) | 'yomi2kanji'(よみ→漢字)
   mode: 'choice', // 'input' | 'choice'
   questionCount: '10', // '10' | '20' | '30' | 'all'
-  pool: [],       // 選択学年のグループ済みリスト(出題対象)
-  dummyPool: [],  // 選択学年以下のグループ済みリスト(4択ダミー用)
+  pool: [],       // 選択ユニットのグループ済みリスト(出題対象)
+  dummyPool: [],  // 累積グループ済みリスト(4択ダミー用)
   quizItems: [],  // 今回出題する分(シャッフル済み)
   index: 0,
   score: 0,
@@ -407,16 +467,17 @@ document.getElementById('name-select').addEventListener('change', (e)=>{
   state.name = e.target.value;
 });
 
-document.querySelectorAll('.grade-btn').forEach(btn=>{
+// 上段(学期・大)と下段(学年・小)は同じ「出題ユニット」を選ぶ1つの選択として扱う。
+// どちらを押しても、もう片方の選択状態は解除する。
+document.querySelectorAll('[data-unit]').forEach(btn=>{
+  if (btn.disabled) return;
   btn.addEventListener('click', ()=>{
-    state.grade = Number(btn.dataset.grade);
-    document.querySelectorAll('.grade-btn').forEach(b=>{
-      b.style.borderColor = b===btn ? 'var(--hanko)' : 'var(--paper-line)';
-      b.style.boxShadow = b===btn ? '3px 3px 0 var(--hanko)' : 'none';
-    });
+    state.unitId = btn.dataset.unit;
+    document.querySelectorAll('[data-unit]').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
     document.getElementById('start-btn').disabled = false;
     document.getElementById('start-btn').textContent = 'クイズをはじめる';
-    document.getElementById('q-grade-label').textContent = state.grade + '年生';
+    document.getElementById('q-grade-label').textContent = UNITS[state.unitId].label;
   });
 });
 
@@ -457,15 +518,16 @@ document.querySelectorAll('[data-count]').forEach(t=>{
 });
 
 document.getElementById('start-btn').addEventListener('click', async ()=>{
-  if (!state.grade) return;
+  if (!state.unitId) return;
+  const unit = UNITS[state.unitId];
   const startBtn = document.getElementById('start-btn');
   startBtn.disabled = true;
   startBtn.textContent = '読み込み中…';
 
   let gradeQuestions, dummySourceQuestions;
   try{
-    gradeQuestions = await fetchGrade(state.grade);
-    dummySourceQuestions = await fetchUpToGrade(state.grade);
+    gradeQuestions = await fetchFiles(unit.files);
+    dummySourceQuestions = await fetchFiles(getCumulativeFiles(unit.files));
   }catch(err){
     alert(`データの読み込みに失敗しました。\n\n【エラー内容】\n${err.message}`);
     startBtn.disabled = false;
@@ -473,7 +535,7 @@ document.getElementById('start-btn').addEventListener('click', async ()=>{
     return;
   }
   if (!gradeQuestions || gradeQuestions.length === 0){
-    alert(`${state.grade}年生のデータ(grade${state.grade}.json)が空、または見つかりませんでした。`);
+    alert(`${unit.label}のデータ(${unit.files.join(', ')}.json)が空、または見つかりませんでした。`);
     startBtn.disabled = false;
     startBtn.textContent = 'クイズをはじめる';
     return;
@@ -650,7 +712,7 @@ function renderResult(){
     `${score}<span style="font-size:22px;color:var(--sumi-soft);">/${total}</span>`;
   const directionLabel = state.direction === 'yomi2kanji' ? 'よみ→漢字' : '漢字→よみ';
   document.querySelector('.result-score .of').textContent =
-    `正解率 ${rate}% ・ ${state.grade}年生 ・ ${directionLabel} ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
+    `正解率 ${rate}% ・ ${UNITS[state.unitId].label} ・ ${directionLabel} ・ ${state.mode === 'input' ? '自由入力' : '4択'}`;
 
   const list = document.querySelector('.review-list');
   list.innerHTML = '';
@@ -674,7 +736,7 @@ function renderResult(){
   sendLog({
     app: 'kanji',
     name: state.name,
-    grade: state.grade,
+    grade: UNITS[state.unitId].label,
     direction: directionLabel,
     mode: state.mode === 'input' ? '自由入力' : '4択',
     score: score,
