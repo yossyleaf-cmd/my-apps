@@ -201,8 +201,8 @@ body{
 
       <span class="field-label">MODE</span>
       <div class="toggle-row">
-        <div class="toggle selected" data-mode="input">自由入力</div>
-        <div class="toggle" data-mode="choice">4択</div>
+        <div class="toggle" data-mode="input">自由入力</div>
+        <div class="toggle selected" data-mode="choice">4択</div>
       </div>
 
       <span class="field-label">COUNT</span>
@@ -390,7 +390,7 @@ let state = {
   grade: null,
   name: 'はると', // なまえ選択(デフォルト:はると)
   direction: 'kanji2yomi', // 'kanji2yomi'(漢字→よみ) | 'yomi2kanji'(よみ→漢字)
-  mode: 'input', // 'input' | 'choice'
+  mode: 'choice', // 'input' | 'choice'
   questionCount: '10', // '10' | '20' | '30' | 'all'
   pool: [],       // 選択学年のグループ済みリスト(出題対象)
   dummyPool: [],  // 選択学年以下のグループ済みリスト(4択ダミー用)
