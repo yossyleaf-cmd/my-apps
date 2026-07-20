@@ -1,0 +1,1016 @@
+{
+  "grade": 4,
+  "label": "小学4年生 1学期",
+  "questions": [
+    {
+      "kanji": "愛",
+      "reading": "あい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "案",
+      "reading": "あん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "以",
+      "reading": "い",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "茨",
+      "reading": "いばら",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "印",
+      "reading": "いん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "印",
+      "reading": "しるし",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "栄",
+      "reading": "えい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "栄",
+      "reading": "さかえる",
+      "type": "くんよみ",
+      "alt": [
+        "はえる",
+        "はえ"
+      ]
+    },
+    {
+      "kanji": "媛",
+      "reading": "えん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "岡",
+      "reading": "おか",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "貨",
+      "reading": "か",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "芽",
+      "reading": "が",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "芽",
+      "reading": "め",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "賀",
+      "reading": "が",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "械",
+      "reading": "かい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "潟",
+      "reading": "かた",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "官",
+      "reading": "かん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "関",
+      "reading": "かん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "関",
+      "reading": "せき",
+      "type": "くんよみ",
+      "alt": [
+        "かかわる"
+      ]
+    },
+    {
+      "kanji": "観",
+      "reading": "かん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "岐",
+      "reading": "き",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "季",
+      "reading": "き",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "旗",
+      "reading": "き",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "旗",
+      "reading": "はた",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "器",
+      "reading": "き",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "器",
+      "reading": "うつわ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "機",
+      "reading": "き",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "機",
+      "reading": "はた",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "泣",
+      "reading": "きゅう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "泣",
+      "reading": "なく",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "給",
+      "reading": "きゅう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "競",
+      "reading": "きょう",
+      "type": "おんよみ",
+      "alt": [
+        "けい"
+      ]
+    },
+    {
+      "kanji": "競",
+      "reading": "きそう",
+      "type": "くんよみ",
+      "alt": [
+        "せる"
+      ]
+    },
+    {
+      "kanji": "熊",
+      "reading": "くま",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "訓",
+      "reading": "くん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "軍",
+      "reading": "ぐん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "郡",
+      "reading": "ぐん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "群",
+      "reading": "ぐん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "群",
+      "reading": "むれる",
+      "type": "くんよみ",
+      "alt": [
+        "むれ",
+        "むら"
+      ]
+    },
+    {
+      "kanji": "景",
+      "reading": "けい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "建",
+      "reading": "けん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "建",
+      "reading": "たてる",
+      "type": "くんよみ",
+      "alt": [
+        "たつ"
+      ]
+    },
+    {
+      "kanji": "健",
+      "reading": "けん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "健",
+      "reading": "すこやか",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "香",
+      "reading": "こう",
+      "type": "おんよみ",
+      "alt": [
+        "きょう"
+      ]
+    },
+    {
+      "kanji": "香",
+      "reading": "か",
+      "type": "くんよみ",
+      "alt": [
+        "かおる",
+        "かおり"
+      ]
+    },
+    {
+      "kanji": "康",
+      "reading": "こう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "佐",
+      "reading": "さ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "菜",
+      "reading": "さい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "菜",
+      "reading": "な",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "埼",
+      "reading": "さい",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "材",
+      "reading": "ざい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "崎",
+      "reading": "さき",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "昨",
+      "reading": "さく",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "氏",
+      "reading": "し",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "氏",
+      "reading": "うじ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "司",
+      "reading": "し",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "試",
+      "reading": "し",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "試",
+      "reading": "こころみる",
+      "type": "くんよみ",
+      "alt": [
+        "ためす"
+      ]
+    },
+    {
+      "kanji": "児",
+      "reading": "じ",
+      "type": "おんよみ",
+      "alt": [
+        "に"
+      ]
+    },
+    {
+      "kanji": "滋",
+      "reading": "じ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "辞",
+      "reading": "じ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "辞",
+      "reading": "やめる",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "鹿",
+      "reading": "しか",
+      "type": "くんよみ",
+      "alt": [
+        "か"
+      ]
+    },
+    {
+      "kanji": "祝",
+      "reading": "しゅく",
+      "type": "おんよみ",
+      "alt": [
+        "しゅう"
+      ]
+    },
+    {
+      "kanji": "祝",
+      "reading": "いわう",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "順",
+      "reading": "じゅん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "初",
+      "reading": "しょ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "初",
+      "reading": "はじめ",
+      "type": "くんよみ",
+      "alt": [
+        "はじめて",
+        "はつ",
+        "うい",
+        "そめる"
+      ]
+    },
+    {
+      "kanji": "城",
+      "reading": "じょう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "城",
+      "reading": "しろ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "縄",
+      "reading": "じょう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "縄",
+      "reading": "なわ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "信",
+      "reading": "しん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "井",
+      "reading": "せい",
+      "type": "おんよみ",
+      "alt": [
+        "しょう"
+      ]
+    },
+    {
+      "kanji": "井",
+      "reading": "い",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "成",
+      "reading": "せい",
+      "type": "おんよみ",
+      "alt": [
+        "じょう"
+      ]
+    },
+    {
+      "kanji": "成",
+      "reading": "なる",
+      "type": "くんよみ",
+      "alt": [
+        "なす"
+      ]
+    },
+    {
+      "kanji": "清",
+      "reading": "せい",
+      "type": "おんよみ",
+      "alt": [
+        "しょう"
+      ]
+    },
+    {
+      "kanji": "清",
+      "reading": "きよい",
+      "type": "くんよみ",
+      "alt": [
+        "きよめる",
+        "きよまる"
+      ]
+    },
+    {
+      "kanji": "静",
+      "reading": "せい",
+      "type": "おんよみ",
+      "alt": [
+        "じょう"
+      ]
+    },
+    {
+      "kanji": "静",
+      "reading": "しずか",
+      "type": "くんよみ",
+      "alt": [
+        "しずまる",
+        "しずめる"
+      ]
+    },
+    {
+      "kanji": "席",
+      "reading": "せき",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "節",
+      "reading": "せつ",
+      "type": "おんよみ",
+      "alt": [
+        "せち"
+      ]
+    },
+    {
+      "kanji": "節",
+      "reading": "ふし",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "説",
+      "reading": "せつ",
+      "type": "おんよみ",
+      "alt": [
+        "ぜい"
+      ]
+    },
+    {
+      "kanji": "説",
+      "reading": "とく",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "戦",
+      "reading": "せん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "戦",
+      "reading": "いくさ",
+      "type": "くんよみ",
+      "alt": [
+        "たたかう"
+      ]
+    },
+    {
+      "kanji": "選",
+      "reading": "せん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "選",
+      "reading": "えらぶ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "争",
+      "reading": "そう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "争",
+      "reading": "あらそう",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "帯",
+      "reading": "たい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "帯",
+      "reading": "おび",
+      "type": "くんよみ",
+      "alt": [
+        "おびる"
+      ]
+    },
+    {
+      "kanji": "隊",
+      "reading": "たい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "達",
+      "reading": "たつ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "沖",
+      "reading": "ちゅう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "沖",
+      "reading": "おき",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "的",
+      "reading": "てき",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "的",
+      "reading": "まと",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "典",
+      "reading": "てん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "伝",
+      "reading": "でん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "伝",
+      "reading": "つたわる",
+      "type": "くんよみ",
+      "alt": [
+        "つたえる",
+        "つたう"
+      ]
+    },
+    {
+      "kanji": "徒",
+      "reading": "と",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "働",
+      "reading": "どう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "働",
+      "reading": "はたらく",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "徳",
+      "reading": "とく",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "栃",
+      "reading": "とち",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "奈",
+      "reading": "な",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "梨",
+      "reading": "なし",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "熱",
+      "reading": "ねつ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "熱",
+      "reading": "あつい",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "梅",
+      "reading": "ばい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "梅",
+      "reading": "うめ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "阪",
+      "reading": "はん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "飯",
+      "reading": "はん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "飯",
+      "reading": "めし",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "飛",
+      "reading": "ひ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "飛",
+      "reading": "とぶ",
+      "type": "くんよみ",
+      "alt": [
+        "とばす"
+      ]
+    },
+    {
+      "kanji": "必",
+      "reading": "ひつ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "必",
+      "reading": "かならず",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "標",
+      "reading": "ひょう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "夫",
+      "reading": "ふ",
+      "type": "おんよみ",
+      "alt": [
+        "ふう"
+      ]
+    },
+    {
+      "kanji": "夫",
+      "reading": "おっと",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "付",
+      "reading": "ふ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "付",
+      "reading": "つく",
+      "type": "くんよみ",
+      "alt": [
+        "つける"
+      ]
+    },
+    {
+      "kanji": "府",
+      "reading": "ふ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "阜",
+      "reading": "ふ",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "富",
+      "reading": "ふ",
+      "type": "おんよみ",
+      "alt": [
+        "ふう"
+      ]
+    },
+    {
+      "kanji": "富",
+      "reading": "とむ",
+      "type": "くんよみ",
+      "alt": [
+        "とみ"
+      ]
+    },
+    {
+      "kanji": "兵",
+      "reading": "へい",
+      "type": "おんよみ",
+      "alt": [
+        "ひょう"
+      ]
+    },
+    {
+      "kanji": "包",
+      "reading": "ほう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "包",
+      "reading": "つつむ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "法",
+      "reading": "ほう",
+      "type": "おんよみ",
+      "alt": [
+        "はっ",
+        "ほっ"
+      ]
+    },
+    {
+      "kanji": "満",
+      "reading": "まん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "満",
+      "reading": "みちる",
+      "type": "くんよみ",
+      "alt": [
+        "みたす"
+      ]
+    },
+    {
+      "kanji": "約",
+      "reading": "やく",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "要",
+      "reading": "よう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "要",
+      "reading": "いる",
+      "type": "くんよみ",
+      "alt": [
+        "かなめ"
+      ]
+    },
+    {
+      "kanji": "養",
+      "reading": "よう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "養",
+      "reading": "やしなう",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "利",
+      "reading": "り",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "利",
+      "reading": "きく",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "良",
+      "reading": "りょう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "良",
+      "reading": "よい",
+      "type": "くんよみ",
+      "alt": [
+        "い"
+      ]
+    },
+    {
+      "kanji": "量",
+      "reading": "りょう",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "量",
+      "reading": "はかる",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "輪",
+      "reading": "りん",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "輪",
+      "reading": "わ",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "類",
+      "reading": "るい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "類",
+      "reading": "たぐい",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "例",
+      "reading": "れい",
+      "type": "おんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "例",
+      "reading": "たとえる",
+      "type": "くんよみ",
+      "alt": []
+    },
+    {
+      "kanji": "録",
+      "reading": "ろく",
+      "type": "おんよみ",
+      "alt": []
+    }
+  ]
+}
